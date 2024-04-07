@@ -2,9 +2,8 @@ import asyncio
 import os
 
 from config import csv_destination_dir, csv_dir, dat_destination_dir, dat_dir
+from data_loader.data_reader import CSVDataReader, DATDataReader
 from data_loader.utils import read_all_files
-
-from source.data_loader.csv_dat_data_loader import CSVDataReader, DATDataReader
 
 
 async def main() -> None:
