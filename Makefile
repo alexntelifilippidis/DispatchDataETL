@@ -1,4 +1,4 @@
-.PHONY: install-dev install-prod start-db stop-db devserver prodserver clean check format tests
+.PHONY: install-dev install-prod activate-env start-db stop-db devserver prodserver clean check format tests
 
 ## ATTENTION! activate virtual environment before running!
 
@@ -13,6 +13,10 @@ install-prod:
 	pip3 install -U pip wheel setuptools pipenv
 	pipenv install
 	pre-commit install
+
+##  activate environment
+activate-env:
+	pipenv shell
 
 ## clear all caches
 clear:

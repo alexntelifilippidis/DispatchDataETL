@@ -19,7 +19,8 @@ Follow these steps to set up the project environment:
 
 ### Prerequisites
 
-Make sure you have Python 3.12 installed on your system. You can download it from [Python's official website](https://www.python.org/downloads/).
+Make sure you have Python 3.12 and [pre-commit](https://pre-commit.com/#intro) installed on your system. You can download it from [Python's official website](https://www.python.org/downloads/).
+And 
 
 ### Installation
 
@@ -50,6 +51,11 @@ Make sure you have Python 3.12 installed on your system. You can download it fro
 
     Depending on whether you want to install development or production dependencies.
 
+
+4. Activate Project
+   ```bash
+    make activate-env
+    ```
 
 ## Testing
 
