@@ -1,1 +1,176 @@
 # DispatchDataETL
+
+
+
+
+1. [Setup](#setup)
+2. [Testing](#testing)
+    1. [Unit Testing](#unit-testing)
+    2. [Integration Testing](#integration-testing)
+    3. [Manual Testing](#manual-testing)
+3. [CI/CD](#cicd)
+    1. [CI](#ci)
+4. [Code Structure](#code-structure)
+
+
+## Setup
+
+Follow these steps to set up the project environment:
+
+### Prerequisites
+
+Make sure you have Python 3.12 installed on your system. You can download it from [Python's official website](https://www.python.org/downloads/).
+
+### Installation
+
+1. Clone the repository to your local machine:
+
+    ```bash
+    git clone https://github.com/alexntelifilippidis/DispatchDataETL.git
+    ```
+
+2. Navigate to the project directory:
+
+    ```bash
+    cd project_name
+    ```
+
+
+3. Install project dependencies using Makefile:
+
+    ```bash
+    make install-dev
+    ```
+
+    or
+
+    ```bash
+    make install-prod
+    ```
+
+    Depending on whether you want to install development or production dependencies.
+
+
+## Testing
+
+### Unit Testing
+Tested with python 3.10.11.
+
+```bash
+  pip install -r requirements.txt
+```
+
+- Run all tests with:
+```bash
+  make unit
+ ```
+
+### Integrity Tests
+
+This is a special category of tests related to dag integrity. To run the integrity suite run:
+
+```bash
+  make integrity
+```
+
+This will inform about import errors. If you need to test a dag for import errors you can run:
+
+```bash
+  CONFIG="your_favourite_config.yaml,your_second_favourite_config.yaml" make check-for-import-error 
+```
+
+(the CONFIG variable is a comma separated list of config files, or a single config file)
+
+### Integration Testing
+
+Part of the automated tests. If you need to test manually, it is as easy as executing
+```bash
+  make integration-tests
+```
+
+or specifically
+
+```bash
+  make integration-environment
+  pytest -v -s tests/integration --no-header -vv || (make teardown && exit 1)
+  make integration-teardown
+```
+
+The integration tests need a running environment consisting of:
+
+- A running airflow docker container
+- An operational events postgres database    
+- A S3 bucket emulated by [a docker image of localstack](https://docs.localstack.cloud/references/docker-images/)
+
+The test dag is triggered, assertions run and setup is cleaned up. These test roles are already present in [docker-compose-test.yaml](docker-compose-test.yaml)
+More information can be found here: https://newcross.atlassian.net/wiki/spaces/DET/pages/3871113257/Integration+Testing
+
+
+To run both unit and integration together run:
+
+```bash
+  make test
+```
+
+
+### Manual Testing
+
+Here we run manually the steps leading to the integration tests. This can be useful for debugging purposes and local development.
+To create a local environment with prepopulated test data you can run:
+
+```bash
+  make integration-environment
+```
+
+You can find 
+
+- the airflow ui on localhost:8080, username and password are both `airflow`.
+- the postgres database on localhost:5432, username is `postgres` and password `example`
+
+(if you need things to be stateful, uncomment postgres and mssql volumes on the [docker-compose-test.yaml](docker-compose-test.yaml) file)
+
+### Run the dag
+
+Visit the [airflow server](http://localhost:8080) and activate your dag called `testing_integration_dag`. 
+Extra info in official Airflow Documentation [Airflow Apache Project](https://airflow.apache.org/).
+
+## CI/CD
+
+The CI/CD pipeline is configured in the [GitHub actions](.github/workflows) files. 
+
+### CI
+The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) file. 
+- It is triggered on every push to the main branch and in every pull request(pr).
+- It runs  unit testing and the integration testing.
+- It also runs the pre-commit hooks to ensure that the code is formatted correctly and that the tests pass before pushing to the main branch.
+- Fails if any of the tests fail.
+
+
+## Code Structure
+```
+.
+├── .github                     # Directory for GitHub actions
+│   └── workflows               # Directory for GitHub actions workflows
+├── ci_scripts                  # Directory where any scripts that your CI/CD might need to access
+├── dags                        # Directory where all your DAGs go
+│   ├── dagfactory              # Directory for dynamically generating DAGs
+│   ├── models                  # Directory for ORM models
+│   ├── operators               # Directory for custom Airflow operators
+│   └── discover_dags.py        # Directory for dynamically generating DAGs from yaml files
+├── plugins                     # Directory for any custom or community Airflow plugins
+│   └── example-plugin.py              
+├── tests                       # Directory for all tests
+│   ├── unit                    # Directory for unit tests
+│   ├── resources               # Directory for testing resources
+│   └── integration             # Directory for integration tests
+├── .gitignore                  # File for ignoring files in git
+├── .pre-commit-config.yaml     # File for running pre-commit hooks before puss to git
+├── docker-compose-test.yaml    # File for set up Testing environment 
+├── Dockerfile-test             # File for AirFlow/python Docker image for testing
+├── Makefile                    # File for any Python packages 
+├── pyproject.toml              # File of python project configurations
+├── requirements.txt            # File for any Python packages prod 
+├── pytest.ini                  # File to add test paths
+└── setup.cfg                   # File for set up
+
+```
