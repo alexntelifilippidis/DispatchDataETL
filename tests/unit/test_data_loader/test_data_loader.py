@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from data_loader.csv_dat_data_loader import CSVDataReader, DATDataReader
+from data_loader.data_reader import CSVDataReader, DATDataReader
 from data_loader.utils import move_file
 
 
