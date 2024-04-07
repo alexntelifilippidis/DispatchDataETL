@@ -38,9 +38,7 @@ async def test_read_all_files():
         result = await read_all_files(reader=AsyncMock(), file_paths=file_paths)
 
         # Assert that asyncio.gather is called with the correct arguments
-        mock_gather.assert_called_once_with(
-            *[AsyncMock().read_data(path) for path in file_paths]
-        )
+        mock_gather.assert_called_once_with(*[AsyncMock().read_data(path) for path in file_paths])
 
         # Assert the result
         assert result == reader_result

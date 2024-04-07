@@ -8,9 +8,7 @@ pytest_plugins = ("pytest_asyncio",)
 # Define a pytest fixture to set up the environment variable
 @pytest.fixture(autouse=True)
 def set_test_env():
-    os.environ["ENV"] = (
-        "test"  # Set the environment variable to 'test' for the duration of tests
-    )
+    os.environ["ENV"] = "test"  # Set the environment variable to 'test' for the duration of tests
     yield  # Execute the tests
     del os.environ["ENV"]  # Remove the environment variable after tests finish
 

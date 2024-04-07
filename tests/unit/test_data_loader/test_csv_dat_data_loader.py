@@ -20,9 +20,7 @@ async def test_read_data(expected_csv_data):
     csv_reader = CSVDataReader()
 
     # Read data from the CSV file
-    data = await csv_reader.read_data(
-        file_path=csv_file_path, destination_dir=destination_dir
-    )
+    data = await csv_reader.read_data(file_path=csv_file_path, destination_dir=destination_dir)
 
     expected_data = expected_csv_data
 
@@ -31,14 +29,10 @@ async def test_read_data(expected_csv_data):
     # Assert that data is correctly read
     assert len(data) > 0  # Assuming the file has at least one row of data
     # Assert that the file is moved to the destination directory
-    assert os.path.exists(
-        os.path.join(destination_dir, os.path.basename(csv_file_path))
-    )
+    assert os.path.exists(os.path.join(destination_dir, os.path.basename(csv_file_path)))
 
     # Move the file back to the original directory
-    await move_file(
-        source_path=destination_dir + "/" + file_name, destination_dir=csv_dir
-    )
+    await move_file(source_path=destination_dir + "/" + file_name, destination_dir=csv_dir)
 
 
 @pytest.mark.asyncio
@@ -56,9 +50,7 @@ async def test_read_data_dat(expected_dat_data):
     dat_reader = DATDataReader()
 
     # Read data from the DAT file
-    data = await dat_reader.read_data(
-        file_path=dat_file_path, destination_dir=destination_dir
-    )
+    data = await dat_reader.read_data(file_path=dat_file_path, destination_dir=destination_dir)
 
     expected_data = expected_dat_data
 
@@ -67,11 +59,7 @@ async def test_read_data_dat(expected_dat_data):
     # Assert that data is correctly read
     assert len(data) > 0  # Assuming the file has at least one row of data
     # Assert that the file is moved to the destination directory
-    assert os.path.exists(
-        os.path.join(destination_dir, os.path.basename(dat_file_path))
-    )
+    assert os.path.exists(os.path.join(destination_dir, os.path.basename(dat_file_path)))
 
     # Move the file back to the original directory for checking the data
-    await move_file(
-        source_path=destination_dir + "/" + file_name, destination_dir=dat_dir
-    )
+    await move_file(source_path=destination_dir + "/" + file_name, destination_dir=dat_dir)

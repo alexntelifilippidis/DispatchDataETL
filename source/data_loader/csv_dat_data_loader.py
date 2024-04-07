@@ -9,9 +9,7 @@ from data_loader.utils import move_file
 class CSVDataReader(AbstractDataReader):
     """Class for reading data from CSV files asynchronously."""
 
-    async def read_data(
-        self, file_path: str, destination_dir: str
-    ) -> List[Dict[str, Any]]:
+    async def read_data(self, file_path: str, destination_dir: str) -> List[Dict[str, Any]]:
         """
         Read data from a CSV file asynchronously and move it to a destination path.
 
@@ -142,9 +140,7 @@ class MySQLDataLoader(AbstractDataReader):
         self.db = db
         self.pool_size = pool_size
 
-    async def load_data_to_db(
-        self, data: List[Tuple[str, str, str]], table_name: str
-    ) -> None:
+    async def load_data_to_db(self, data: List[Tuple[str, str, str]], table_name: str) -> None:
         """
         Load data into MySQL database asynchronously.
 
@@ -170,8 +166,7 @@ class MySQLDataLoader(AbstractDataReader):
                         "column3 VARCHAR(255))"
                     )
                     await cursor.executemany(
-                        f"INSERT INTO {table_name} (column1, column2, column3) "
-                        "VALUES (%s, %s, %s)",
+                        f"INSERT INTO {table_name} (column1, column2, column3) " "VALUES (%s, %s, %s)",
                         data,
                     )
                     await conn.commit()

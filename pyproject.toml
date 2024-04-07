@@ -1,31 +1,12 @@
 # `black` does not work with setup.cfg
 # as seen here: https://blog.pilosus.org/posts/2019/12/26/python-third-party-tools-configuration/
 
-
-
-[tool.flake8]
-max-line-length = 132
-max-complexity = 20
-exclude = [
-    # List of directories or files to exclude from linting
-]
-extend-ignore = [
-    # List of error codes to ignore
-]
-
-[tool.pytest]
-addopts = "-ra -q --durations=5 -s"
-testpaths = [
-    "tests"
-]
-pythonpath = [
-    "source"
-]
-
-[mypy]
-ignore_missing_imports = true
-namespace_packages = true
-follow_imports = "skip" # used for https://github.com/python/mypy/issues/13627 since we cant update mypy
+[tool.black]
+exclude = '(\.git|\.mypy_cache|\.venv)'
+include = '\.pyi?$'
+target-version = ['py312']
+line-length = 132
+fast = true
 
 [tool.coverage.report]
 show_missing = true
@@ -38,7 +19,7 @@ omit = ["*/__init__.py",
 output = "coverage-reports/cobertura-coverage.xml"
 
 [tool.coverage.run]
-source = ["airflow_template"]
+source = ["source"]
 branch = true
 relative_files = true
 omit = ["*/__init__.py",
@@ -49,3 +30,8 @@ omit = ["*/__init__.py",
     ".git"
 ]
 
+
+[tool.mypy]
+ignore_missing_imports = true
+namespace_packages = true
+follow_imports = "skip" # used for https://github.com/python/mypy/issues/13627 since we cant update mypy

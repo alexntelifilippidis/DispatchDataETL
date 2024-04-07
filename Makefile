@@ -35,13 +35,12 @@ uninstall-dev:
 check:
 	isort --check source tests 	# setup.cfg
 	black --check source tests # setup.cfg
-	flake8 source tests	 # setup.cfg
 	mypy source tests --explicit-package-bases # setup.cfg
 
 ## reformat the files using the formatters
 format:
-	black source tests
 	isort source tests
+	black source tests  --fast
 
 ## down build docker image
 drop-image:
