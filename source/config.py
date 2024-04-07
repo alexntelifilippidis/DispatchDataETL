@@ -17,6 +17,7 @@ if env == "test":
     dat_destination_dir = "tests/test_data/test_data_dat_destination"
     csv_dir = "tests/test_data/test_data_csv"
     csv_destination_dir = "tests/test_data/test_data_csv_destination"
+    chunk_size = 50
 else:
     # If the environment is not set to "test"
     print("Environment is set to production")
@@ -25,3 +26,4 @@ else:
     dat_destination_dir = "../tests/test_data/test_data_dat_destination"
     csv_dir = "../tests/test_data/test_data_csv"
     csv_destination_dir = "../tests/test_data/test_data_csv_destination"
+    chunk_size = 100

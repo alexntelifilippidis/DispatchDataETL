@@ -1,10 +1,12 @@
+import asyncio
+from abc import ABC
 from typing import List, Tuple
 
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataReader
 
 
-class MySQLDataLoader(AbstractDataReader):
+class MySQLDataLoader(AbstractDataReader, ABC):
     """Class for loading data into MySQL database asynchronously."""
 
     def __init__(
@@ -34,14 +36,17 @@ class MySQLDataLoader(AbstractDataReader):
         self.db = db
         self.pool_size = pool_size
 
-    async def load_data_to_db(self, data: List[Tuple[str, str, str]], table_name: str) -> None:
+    async def load_data_to_db(self, data: List[Tuple[str, str, str]], table_name: str, chunk_size: int) -> None:
         """
-        Load data into MySQL database asynchronously.
+        Insert data into MySQL database asynchronously.
 
         Args:
-            data (List[Tuple[str, str, str]]): List of tuples containing data to be loaded into the database.
+            data (List[Tuple[str, str, str]]): List of tuples containing data to be inserted into the database.
             table_name (str): Name of the table in the database.
+            chunk_size (int): How many lines will ingest to table
         """
+        chunk_size = chunk_size
+        tasks = []
         async with aiomysql.create_pool(
             host=self.host,
             port=self.port,
@@ -59,8 +64,24 @@ class MySQLDataLoader(AbstractDataReader):
                         "column2 VARCHAR(255), "
                         "column3 VARCHAR(255))"
                     )
-                    await cursor.executemany(
-                        f"INSERT INTO {table_name} (column1, column2, column3) " "VALUES (%s, %s, %s)",
-                        data,
-                    )
+                    # Split data into chunks
+                    chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
+                    for chunk in chunks:
+                        task = asyncio.create_task(self._insert_chunk(cursor, table_name, chunk))
+                        tasks.append(task)
+                    await asyncio.gather(*tasks)
                     await conn.commit()
+
+    async def _insert_chunk(self, cursor, table_name: str, chunk: List[Tuple[str, str, str]]) -> None:
+        """
+        Insert a chunk of data into MySQL database asynchronously.
+
+        Args:
+            cursor: Cursor object for executing queries.
+            table_name (str): Name of the table in the database.
+            chunk (List[Tuple[str, str, str]]): Chunk of data to be inserted into the database.
+        """
+        await cursor.executemany(
+            f"INSERT INTO {table_name} (column1, column2, column3) VALUES (%s, %s, %s)",
+            chunk,
+        )
