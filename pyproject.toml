@@ -4,7 +4,6 @@
 [tool.black]
 exclude = '(\.git|\.mypy_cache|\.venv)'
 include = '\.pyi?$'
-target-version = ['py312']
 line-length = 132
 fast = true
 
