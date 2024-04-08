@@ -64,7 +64,7 @@ integration-environment:
 ## tear down environment
 integration-teardown:
 	echo "Tearing down environment"
-	docker-compose -f docker-compose-test.yaml down -v
+	docker-compose -f docker-compose.yaml down -v
 
 	echo "Clearing caches"
 	make clear

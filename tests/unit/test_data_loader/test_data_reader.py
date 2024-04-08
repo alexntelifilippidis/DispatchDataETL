@@ -1,7 +1,8 @@
 import os
+from unittest.mock import MagicMock, patch
 
 import pytest
-from data_loader.data_reader import CSVDataReader, DATDataReader
+from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
 from data_loader.utils import move_file
 
 

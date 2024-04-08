@@ -18,6 +18,13 @@ if env == "test":
     csv_dir = "tests/test_data/test_data_csv"
     csv_destination_dir = "tests/test_data/test_data_csv_destination"
     chunk_size = 50
+    host = "localhost"
+    port = 3306
+    user = "root"
+    password = "test_password"
+    db = "dbo"
+    pool_size = 10
+    table_name_source = "Packages"
 else:
     # If the environment is not set to "test"
     print("Environment is set to production")
@@ -27,3 +34,10 @@ else:
     csv_dir = "../tests/test_data/test_data_csv"
     csv_destination_dir = "../tests/test_data/test_data_csv_destination"
     chunk_size = 100
+    host = "localhost"
+    port = 3306
+    user = "root"
+    password = "test_password"
+    db = "dbo"
+    pool_size = 5
+    table_name_source = "Packages"
