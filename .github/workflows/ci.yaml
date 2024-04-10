@@ -31,7 +31,7 @@ jobs:
           # install dependencies
           pip3 install -U pip wheel setuptools pipenv
           pipenv install --dev
-          pipenv lock --requirements > requirements.txt
+          pipenv requirements > requirements.txt --dev
           pip install -r requirements.txt
 
       - name: Check
