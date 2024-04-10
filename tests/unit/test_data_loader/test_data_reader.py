@@ -8,7 +8,7 @@ from data_loader.utils import move_file
 
 
 @pytest.mark.asyncio
-async def test_read_data(expected_csv_data):
+async def test_read_data_csv(expected_csv_data):
     from config import csv_destination_dir, csv_dir
 
     file_name = "01062023_155202_01_01_19112930098.csv"
@@ -31,6 +31,7 @@ async def test_read_data(expected_csv_data):
     # Assert that data is correctly read
     assert len(data) > 0  # Assuming the file has at least one row of data
     # Assert that the file is moved to the destination directory
+    print(os.path.join(destination_dir, os.path.basename(csv_file_path)))
     assert os.path.exists(os.path.join(destination_dir, os.path.basename(csv_file_path)))
 
     # Move the file back to the original directory
