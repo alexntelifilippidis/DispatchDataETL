@@ -24,11 +24,8 @@ jobs:
 
       - name: Set permissions for files
         run: |
-          ls -l
-          cd tests
-          ls -l
-          cd test_data
-          ls -l
+          mkdir -p tests/test_data/test_data_csv_destination
+          mkdir -p tests/test_data/test_data_dat_destination
           sudo chmod -R u+rwx tests/test_data/test_data_csv
           sudo chmod -R u+rwx tests/test_data/test_data_csv_destination
           sudo chmod -R u+rwx tests/test_data/test_data_dat
