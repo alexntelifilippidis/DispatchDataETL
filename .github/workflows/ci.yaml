@@ -30,7 +30,7 @@ jobs:
         run: |
           # install dependencies
           pip3 install -U pip wheel setuptools pipenv
-          pipenv install --deploy --ignore-pipfile
+          pipenv install --deploy --ignore-pipfile --dev
 
       - name: Check
         id: check
