@@ -7,7 +7,7 @@ from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReade
 from data_loader.utils import logger, my_logger, read_all_files
 
 
-async def main() -> None:
+async def main(dry_run: bool) -> None:
 
     logger.info("Starting main process")
 
@@ -45,11 +45,13 @@ async def main() -> None:
         reader=csv_file_reader,
         file_paths=csv_files,
         destination_dir=conf.csv_destination_dir,
+        dry_run=dry_run,
     )
     dat_task = read_all_files(
         reader=dat_file_reader,
         file_paths=dat_files,
         destination_dir=conf.dat_destination_dir,
+        dry_run=dry_run,
     )
     mysql_task = mysql_data_reader.read_data(table_name=conf.table_name_source)
 
@@ -78,6 +80,7 @@ async def main() -> None:
         creation_columns=conf.creation_column_dat,
         chunk_size=conf.chunk_size,
         loop=loop,
+        dry_run=dry_run,
     )
 
     await mysql_data_loader.load_data_to_db(
@@ -86,10 +89,11 @@ async def main() -> None:
         creation_columns=conf.creation_column_csv,
         chunk_size=conf.chunk_size,
         loop=loop,
+        dry_run=dry_run,
     )
 
     await my_logger.log_with_time_elapsed("Finish data ingestion to Source DBs")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main(dry_run=conf.dry_run))

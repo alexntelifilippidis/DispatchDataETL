@@ -12,13 +12,14 @@ from data_loader.utils import logger, move_file
 class CSVDataReader(AbstractDataReader):
     """Class for reading data from CSV files asynchronously."""
 
-    async def read_data(self, file_path: str, destination_dir: str) -> list[list[str]]:
+    async def read_data(self, file_path: str, destination_dir: str, dry_run: bool = False) -> list[list[str]]:
         """
         Read data from a CSV file asynchronously and move it to a destination path.
 
         Parameters:
             file_path (str): The path to the CSV file to read.
             destination_dir (str): The path to move the CSV file to after reading.
+            dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
             List[Dict[str, Any]]: The data read from the CSV file.
@@ -29,16 +30,18 @@ class CSVDataReader(AbstractDataReader):
             for row in spamreader:
                 data.append(row[0].split(";"))
         # Move the file after reading
-        await move_file(file_path, destination_dir)
-        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
+        if not dry_run:
+            await move_file(file_path, destination_dir)
+            logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
-    async def transform_data(self, data: List[List[dict]]) -> list[tuple[dict | Any, ...]]:
+    async def transform_data(self, data: List[List[dict]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:
         """
         Parse the provided data and convert values to appropriate types.
 
         Parameters:
             data (List[List[dict]]): A list containing sublists of dictionaries with string values.
+            dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
             List[Tuple[datetime, Union[int, float, str]]]: A list of tuples where values are converted to appropriate types.
@@ -64,13 +67,14 @@ class CSVDataReader(AbstractDataReader):
 class DATDataReader(AbstractDataReader):
     """Class for reading data from DAT files asynchronously."""
 
-    async def read_data(self, file_path: str, destination_dir: str) -> List[List[str]]:
+    async def read_data(self, file_path: str, destination_dir: str, dry_run: bool = False) -> List[List[str]]:
         """
         Read data from a DAT file asynchronously and move it to a destination path.
 
         Parameters:
             file_path (str): The path to the DAT file to read.
             destination_dir (str): The path to move the DAT file to after reading.
+            dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
             List[List[str]]: A list of lists, where each inner list represents a row of data read from the DAT file.
@@ -81,16 +85,18 @@ class DATDataReader(AbstractDataReader):
                 # Custom logic to parse DAT file lines
                 data.append(line.strip().split(","))
         # Move the file after reading
-        await move_file(file_path, destination_dir)
-        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
+        if not dry_run:
+            await move_file(file_path, destination_dir)
+            logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
-    async def transform_data(self, data: List[List[str]]) -> list[tuple[dict | Any, ...]]:
+    async def transform_data(self, data: List[List[str]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:
         """
         Transform the provided data into a list of dictionaries.
 
         Parameters:
             data (List[List[str]]): A list containing sublists of strings with key-value pairs.
+            dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
             List[List[dict]]: A list where each sublist contains dictionaries with key-value pairs.
@@ -141,16 +147,21 @@ class MySQLDataReader(AbstractDataReader):
         self.db = db
         self.pool_size = pool_size
 
-    async def read_data(self, table_name: str) -> List[Tuple]:
+    async def read_data(self, table_name: str, dry_run: bool = False) -> List[Tuple]:
         """
         Read data from MySQL database asynchronously.
 
         Args:
             table_name (str): Name of the table in the database.
+            dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
             List[Tuple]: List of tuples containing the data read from the database.
         """
+        if dry_run:
+            logger.info("Performing dry run. No data will be fetched from the database.")
+            return []  # Return empty list indicating no data fetched in dry run mode
+
         async with aiomysql.create_pool(
             host=self.host,
             port=self.port,

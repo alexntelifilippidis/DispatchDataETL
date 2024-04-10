@@ -15,6 +15,7 @@ if env == "test":
     # If the environment is set to "test"
     logger.info("Environment is set to Test")
     # Add your test-specific configurations or actions here
+    dry_run = False
     dat_dir = "tests/test_data/test_data_dat"
     dat_destination_dir = "tests/test_data/test_data_dat_destination"
     csv_dir = "tests/test_data/test_data_csv"
@@ -31,6 +32,7 @@ else:
     # If the environment is not set to "test" or "dry-run"
     logger.info("Environment is set to Production")
     # Add your non-test configurations or actions here
+    dry_run = False
     dat_dir = "../tests/test_data/test_data_dat"
     dat_destination_dir = "../tests/test_data/test_data_dat_destination"
     csv_dir = "../tests/test_data/test_data_csv"
