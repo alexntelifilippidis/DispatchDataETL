@@ -3,6 +3,10 @@ import shutil
 from typing import Any, List
 
 from data_loader.abstract_data_loader import AbstractDataReader
+from data_loader.logger import MyLogger
+
+my_logger = MyLogger("my_logger")
+logger = my_logger.get_logger()
 
 
 async def move_file(source_path: str, destination_dir: str) -> None:

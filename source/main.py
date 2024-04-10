@@ -4,11 +4,10 @@ import os
 import config as conf
 from data_loader.data_loader import MySQLDataLoader
 from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
-from data_loader.utils import read_all_files
+from data_loader.utils import logger, my_logger, read_all_files
 
 
 async def main() -> None:
-    """Main function to demonstrate usage."""
 
     csv_file_reader = CSVDataReader()
     dat_file_reader = DATDataReader()
@@ -52,18 +51,22 @@ async def main() -> None:
     )
     mysql_task = mysql_data_reader.read_data(table_name=conf.table_name_source)
 
+    logger.info("Starting read data process")
+
     # Execute tasks concurrently
     csv_data = await csv_task
     dat_data = await dat_task
     mysql_data = await mysql_task
 
+    await my_logger.log_with_time_elapsed("Finish read data process")
+    logger.info("Starting data transforming process")
+
     # Transform data
     csv_data_transformed = await csv_file_reader.transform_data(csv_data)
     dat_data_transformed = await dat_file_reader.transform_data(dat_data)
 
-    print("CSV data:", csv_data_transformed)
-    print("DAT data:", dat_data_transformed)
-    print("MySQL data:", mysql_data)
+    await my_logger.log_with_time_elapsed("Finish data transforming process")
+    logger.info("Starting data ingestion to Source DBs")
 
     loop = asyncio.get_event_loop()
     # Load data to source tables
@@ -82,6 +85,8 @@ async def main() -> None:
         chunk_size=conf.chunk_size,
         loop=loop,
     )
+
+    await my_logger.log_with_time_elapsed("Finish data ingestion to Source DBs")
 
 
 if __name__ == "__main__":

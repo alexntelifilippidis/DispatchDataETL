@@ -4,13 +4,13 @@
 
 
 1. [Setup](#setup)
-2. [Testing](#testing)
+2. [Configuration](#configuration)
+3. [Testing](#testing)
     1. [Unit Testing](#unit-testing)
     2. [Integration Testing](#integration-testing)
-    3. [Manual Testing](#manual-testing)
-3. [CI/CD](#cicd)
+4. [CI/CD](#cicd)
     1. [CI](#ci)
-4. [Code Structure](#code-structure)
+5. [Code Structure](#code-structure)
 
 
 ## Setup
@@ -21,6 +21,27 @@ Follow these steps to set up the project environment:
 
 Make sure you have Python 3.12 and [pre-commit](https://pre-commit.com/#intro) installed on your system. You can download it from [Python's official website](https://www.python.org/downloads/).
 And 
+
+## Configuration
+
+The application uses a configuration file to specify various settings and parameters. The configuration file should be named `config.py` and should be placed in the root directory of the project.
+
+### Configuration Options
+
+- `dat_dir`: Path to the directory containing DAT files.
+- `dat_destination_dir`: Path to the directory where processed DAT files should be stored.
+- `csv_dir`: Path to the directory containing CSV files.
+- `csv_destination_dir`: Path to the directory where processed CSV files should be stored.
+- `chunk_size`: Size of data chunks for processing.
+- `host`: Database host.
+- `port`: Database port.
+- `user`: Database user.
+- `password`: Database password.
+- `db`: Database name.
+- `pool_size`: Size of the database connection pool.
+- `table_name_source`: Name of the source table in the database.
+- `creation_column_csv`: The columns for the source csv table
+- `creation_column_dat`: The columns for the source dat table
 
 ### Installation
 
@@ -60,10 +81,10 @@ And
 ## Testing
 
 ### Unit Testing
-Tested with python 3.10.11.
+Tested with python 3.12.2
 
 ```bash
-  pip install -r requirements.txt
+  make activate-env
 ```
 
 - Run all tests with:
@@ -71,21 +92,6 @@ Tested with python 3.10.11.
   make unit
  ```
 
-### Integrity Tests
-
-This is a special category of tests related to dag integrity. To run the integrity suite run:
-
-```bash
-  make integrity
-```
-
-This will inform about import errors. If you need to test a dag for import errors you can run:
-
-```bash
-  CONFIG="your_favourite_config.yaml,your_second_favourite_config.yaml" make check-for-import-error 
-```
-
-(the CONFIG variable is a comma separated list of config files, or a single config file)
 
 ### Integration Testing
 
@@ -104,12 +110,7 @@ or specifically
 
 The integration tests need a running environment consisting of:
 
-- A running airflow docker container
-- An operational events postgres database    
-- A S3 bucket emulated by [a docker image of localstack](https://docs.localstack.cloud/references/docker-images/)
-
-The test dag is triggered, assertions run and setup is cleaned up. These test roles are already present in [docker-compose-test.yaml](docker-compose-test.yaml)
-More information can be found here: https://newcross.atlassian.net/wiki/spaces/DET/pages/3871113257/Integration+Testing
+- A running operational mysql docker container
 
 
 To run both unit and integration together run:
@@ -118,27 +119,6 @@ To run both unit and integration together run:
   make test
 ```
 
-
-### Manual Testing
-
-Here we run manually the steps leading to the integration tests. This can be useful for debugging purposes and local development.
-To create a local environment with prepopulated test data you can run:
-
-```bash
-  make integration-environment
-```
-
-You can find 
-
-- the airflow ui on localhost:8080, username and password are both `airflow`.
-- the postgres database on localhost:5432, username is `postgres` and password `example`
-
-(if you need things to be stateful, uncomment postgres and mssql volumes on the [docker-compose-test.yaml](docker-compose-test.yaml) file)
-
-### Run the dag
-
-Visit the [airflow server](http://localhost:8080) and activate your dag called `testing_integration_dag`. 
-Extra info in official Airflow Documentation [Airflow Apache Project](https://airflow.apache.org/).
 
 ## CI/CD
 
@@ -152,31 +132,25 @@ The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) 
 - Fails if any of the tests fail.
 
 
+
 ## Code Structure
 ```
 .
 ├── .github                     # Directory for GitHub actions
 │   └── workflows               # Directory for GitHub actions workflows
-├── ci_scripts                  # Directory where any scripts that your CI/CD might need to access
-├── dags                        # Directory where all your DAGs go
-│   ├── dagfactory              # Directory for dynamically generating DAGs
-│   ├── models                  # Directory for ORM models
-│   ├── operators               # Directory for custom Airflow operators
-│   └── discover_dags.py        # Directory for dynamically generating DAGs from yaml files
-├── plugins                     # Directory for any custom or community Airflow plugins
-│   └── example-plugin.py              
+├── source                      # Directory where all your source code exists
+│   ├── data_loader             # Directory for all etl classes
+│   ├── config.py               # Config file for the source code
+│   └── main.py                 # The running file           
 ├── tests                       # Directory for all tests
 │   ├── unit                    # Directory for unit tests
-│   ├── resources               # Directory for testing resources
 │   └── integration             # Directory for integration tests
 ├── .gitignore                  # File for ignoring files in git
 ├── .pre-commit-config.yaml     # File for running pre-commit hooks before puss to git
-├── docker-compose-test.yaml    # File for set up Testing environment 
-├── Dockerfile-test             # File for AirFlow/python Docker image for testing
+├── docker-compose.yaml         # File for set up Testing environment 
 ├── Makefile                    # File for any Python packages 
 ├── pyproject.toml              # File of python project configurations
-├── requirements.txt            # File for any Python packages prod 
-├── pytest.ini                  # File to add test paths
+├── Pipfile                     # File for any Python packages prod and dev
 └── setup.cfg                   # File for set up
 
 ```

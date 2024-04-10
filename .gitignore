@@ -10,6 +10,7 @@ dist
 MANIFEST
 .idea
 .vscode
+.log
 logs
 tests/logs/
 coverage-reports/
