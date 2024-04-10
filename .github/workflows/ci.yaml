@@ -24,10 +24,11 @@ jobs:
 
       - name: Set permissions for files
         run: |
-            chmod -R u+rwx tests/test_data/test_data_csv
-            chmod -R u+rwx tests/test_data/test_data_csv_destination
-            chmod -R u+rwx tests/test_data/test_data_dat
-            chmod -R u+rwx tests/test_data/test_data_dat_destination
+          ls -l
+          sudo chmod -R u+rwx tests/test_data/test_data_csv
+          sudo chmod -R u+rwx tests/test_data/test_data_csv_destination
+          sudo chmod -R u+rwx tests/test_data/test_data_dat
+          sudo chmod -R u+rwx tests/test_data/test_data_dat_destination
 
       - name: Set up Python version
         uses: actions/setup-python@v5
