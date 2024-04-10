@@ -31,7 +31,7 @@ async def test_read_data_csv(expected_csv_data):
     # Assert that data is correctly read
     assert len(data) > 0  # Assuming the file has at least one row of data
     # Assert that the file is moved to the destination directory
-    print(os.path.join(destination_dir, os.path.basename(csv_file_path)))
+    print("***dest_path*** : ", os.path.join(destination_dir, os.path.basename(csv_file_path)))
     assert os.path.exists(os.path.join(destination_dir, os.path.basename(csv_file_path)))
 
     # Move the file back to the original directory
