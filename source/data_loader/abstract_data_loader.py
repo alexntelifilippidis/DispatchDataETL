@@ -3,11 +3,16 @@ from typing import Any
 
 
 class AbstractDataReader(ABC):
-    """Abstract class for reading files asynchronously."""
+    """Abstract class for reading data asynchronously."""
 
     @abstractmethod
     async def read_data(self, **kwargs) -> Any:
-        """Read data from a file asynchronously."""
+        """Read data asynchronously."""
+        pass
+
+    @abstractmethod
+    async def transform_data(self, **kwargs) -> Any:
+        """Transform data asynchronously."""
         pass
 
 

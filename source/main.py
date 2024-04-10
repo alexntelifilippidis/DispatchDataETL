@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import config as conf
+from data_loader.data_loader import MySQLDataLoader
 from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
 from data_loader.utils import read_all_files
 
@@ -12,6 +13,14 @@ async def main() -> None:
     csv_file_reader = CSVDataReader()
     dat_file_reader = DATDataReader()
     mysql_data_reader = MySQLDataReader(
+        host=conf.host,
+        port=conf.port,  # Your MySQL port
+        user=conf.user,
+        password=conf.password,
+        db=conf.db,
+        pool_size=conf.pool_size,
+    )
+    mysql_data_loader = MySQLDataLoader(
         host=conf.host,
         port=conf.port,  # Your MySQL port
         user=conf.user,
@@ -48,9 +57,31 @@ async def main() -> None:
     dat_data = await dat_task
     mysql_data = await mysql_task
 
-    print("CSV data:", csv_data)
-    print("DAT data:", dat_data)
+    # Transform data
+    csv_data_transformed = await csv_file_reader.transform_data(csv_data)
+    dat_data_transformed = await dat_file_reader.transform_data(dat_data)
+
+    print("CSV data:", csv_data_transformed)
+    print("DAT data:", dat_data_transformed)
     print("MySQL data:", mysql_data)
+
+    loop = asyncio.get_event_loop()
+    # Load data to source tables
+    await mysql_data_loader.load_data_to_db(
+        data=dat_data_transformed,
+        table_name="source_dat",
+        creation_columns=conf.creation_column_dat,
+        chunk_size=conf.chunk_size,
+        loop=loop,
+    )
+
+    await mysql_data_loader.load_data_to_db(
+        data=csv_data_transformed,
+        table_name="source_csv",
+        creation_columns=conf.creation_column_csv,
+        chunk_size=conf.chunk_size,
+        loop=loop,
+    )
 
 
 if __name__ == "__main__":

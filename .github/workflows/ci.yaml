@@ -1,0 +1,69 @@
+name: CI Workflow
+
+# This workflow runs on both pull requests and pushes to the master branch.
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+
+# Concurrency settings to manage workflow execution.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+
+# Jobs section begins.
+jobs:
+  # Build and Test job.
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create Files & Set permissions
+        run: |
+          mkdir -p tests/test_data/test_data_csv_destination
+          mkdir -p tests/test_data/test_data_dat_destination
+          sudo chmod -R u+rwx tests/test_data/test_data_csv
+          sudo chmod -R u+rwx tests/test_data/test_data_csv_destination
+          sudo chmod -R u+rwx tests/test_data/test_data_dat
+          sudo chmod -R u+rwx tests/test_data/test_data_dat_destination
+
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          # install dependencies
+          pip3 install -U pip wheel setuptools pipenv
+          pipenv install --dev
+          pipenv requirements > requirements.txt --dev
+          pip install -r requirements.txt
+
+      - name: Check
+        id: check
+        run: |
+          make check
+
+      - name: Unit Test with pytest
+        id: unit_test
+        run: |
+          pytest -v -s tests/unit --no-header -vv --cov=dags --cov-report=xml --cov-report=term-missing
+
+      - name: Integration Test with pytest
+        id: integration-tests
+        run: |  
+          make integration-tests
+
+      - name: Cleanup Integration Tests Environment
+        id: cleanup-environment
+        run: |
+          echo "Docker compose down"
+          docker-compose -f docker-compose.yaml down -v
+          
+          echo "Clearing caches"
+          make clear
