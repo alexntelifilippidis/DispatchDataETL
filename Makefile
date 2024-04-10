@@ -44,7 +44,7 @@ check:
 ## reformat the files using the formatters
 format:
 	isort source tests
-	black source tests  --fast
+	black source tests
 
 ## down build docker image
 drop-image:
@@ -58,9 +58,6 @@ build-image:
 integration-environment:
 	docker compose -f docker-compose.yaml up -d --wait
 
-	echo "Initializing pg database"
-	python ci_scripts/setup_pg_database.py
-
 ## tear down environment
 integration-teardown:
 	echo "Tearing down environment"
@@ -71,9 +68,9 @@ integration-teardown:
 ## run integration tests
 integration-tests:
 	make integration-environment
-
+	sleep 30
 	echo "Running integration tests"
-	pytest -v -s tests/integration --no-header -vv --alluredir=allure_results || (make integration-teardown && exit 1)
+	pytest -v -s tests/integration --no-header -vv || (make integration-teardown && exit 1)
 	make integration-teardown
 
 ## run unit tests

@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 aiomysql = "==0.2.0"
 pre-commit = "*"
+cryptography = "*"
+pandas = "*"
 
 [dev-packages]
 pre-commit = "==3.7.0"
