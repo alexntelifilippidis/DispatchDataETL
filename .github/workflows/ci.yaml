@@ -11,8 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-permissions:
-  contents: write
 
 # Jobs section begins.
 jobs:
@@ -23,6 +21,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set permissions for files
+        run: |
+            chmod -R u+rwx tests/test_data/test_data_csv
+            chmod -R u+rwx tests/test_data/test_data_csv_destination
+            chmod -R u+rwx tests/test_data/test_data_dat
+            chmod -R u+rwx tests/test_data/test_data_dat_destination
 
       - name: Set up Python version
         uses: actions/setup-python@v5
