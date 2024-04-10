@@ -4,11 +4,11 @@ import os
 import config as conf
 from data_loader.data_loader import MySQLDataLoader
 from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
+from data_loader.logger import MyLogger
 from data_loader.utils import read_all_files
 
 
 async def main() -> None:
-    """Main function to demonstrate usage."""
 
     csv_file_reader = CSVDataReader()
     dat_file_reader = DATDataReader()

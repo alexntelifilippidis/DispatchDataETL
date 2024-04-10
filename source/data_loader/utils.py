@@ -3,6 +3,10 @@ import shutil
 from typing import Any, List
 
 from data_loader.abstract_data_loader import AbstractDataReader
+from data_loader.logger import MyLogger
+
+my_logger = MyLogger("my_logger")
+logger = my_logger.get_logger()
 
 
 async def move_file(source_path: str, destination_dir: str) -> None:
@@ -14,6 +18,7 @@ async def move_file(source_path: str, destination_dir: str) -> None:
         destination_dir (str): The path where the file should be moved to.
     """
     shutil.move(source_path, destination_dir)
+    logger.info(f"move {source_path} to {destination_dir}")
 
 
 async def read_all_files(reader: AbstractDataReader, file_paths: List[str], destination_dir: str) -> list[Any]:

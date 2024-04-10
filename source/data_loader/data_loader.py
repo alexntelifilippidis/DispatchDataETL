@@ -4,6 +4,7 @@ from typing import Any, List, Tuple
 
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataLoader
+from data_loader.utils import logger
 
 
 class MySQLDataLoader(AbstractDataLoader, ABC):
@@ -86,3 +87,4 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                     await conn.commit()
 
             conn.close()
+            logger.info(f"Insert Data to table: {table_name}")

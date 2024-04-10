@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataReader
-from data_loader.utils import move_file
+from data_loader.utils import logger, move_file
 
 
 class CSVDataReader(AbstractDataReader):
@@ -28,7 +28,9 @@ class CSVDataReader(AbstractDataReader):
             for row in spamreader:
                 data.append(row[0].split(";"))
         # Move the file after reading
+        logger.info(f"read all csv files from {file_path}")
         await move_file(file_path, destination_dir)
+
         return data
 
     async def transform_data(self, data: List[List[dict]]) -> list[tuple[dict | Any, ...]]:
@@ -79,6 +81,7 @@ class DATDataReader(AbstractDataReader):
                 # Custom logic to parse DAT file lines
                 data.append(line.strip().split(","))
         # Move the file after reading
+        logger.info(f"read all csv files from {file_path}")
         await move_file(file_path, destination_dir)
 
         return data
