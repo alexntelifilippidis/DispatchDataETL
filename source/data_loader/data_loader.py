@@ -37,7 +37,7 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
         self.pool_size = pool_size
 
     async def load_data_to_db(
-        self, data: list[tuple[dict | Any, ...]], table_name: str, creation_columns: str, chunk_size: int
+        self, data: list[tuple[dict | Any, ...]], table_name: str, creation_columns: str, chunk_size: int, loop: Any
     ) -> None:
         """
         Insert data into MySQL database asynchronously.
@@ -47,60 +47,42 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
             table_name (str): Name of the table in the database.
             chunk_size (int): How many lines will ingest to table
             creation_columns (str): all the columns that i need to add for create the table:
+            loop (Any):
         """
-        chunk_size = chunk_size
-        tasks = []
-        async with aiomysql.create_pool(
+        chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
+        pool = await aiomysql.create_pool(
             host=self.host,
             port=self.port,
             user=self.user,
             password=self.password,
             db=self.db,
             maxsize=self.pool_size,
-        ) as pool:
-            async with pool.acquire() as conn:
-                async with conn.cursor() as cursor:
-                    try:
-                        await cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({creation_columns})")
-                        chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
-                        for chunk in chunks:
-                            task = asyncio.create_task(self._insert_chunk(cursor, table_name, chunk, creation_columns))  # type: ignore
-                            tasks.append(task)
-                        await asyncio.gather(*tasks)
-                        await conn.commit()
-                    except Exception as e:
-                        print(f"Error: {e}")
-                        await conn.rollback()  # Rollback in case of error
-                        raise  # Reraise the exception for handling at a higher level
-                    finally:
-                        pool.close()  # Close the connection pool
-                        await pool.wait_closed()  # Wait for connections to close
+            loop=loop,
+            autocommit=True,
+        )
+        async with pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({creation_columns})")
+                await conn.commit()
+                for chunk in chunks:
+                    # Split the string into lines
+                    lines = creation_columns.strip().split("\n")
 
-    async def _insert_chunk(self, cursor, table_name: str, chunk: List[Tuple[str, int, float]], creation_columns: str) -> None:
-        """
-        Insert a chunk of data into MySQL database asynchronously.
+                    # Extract column names from each line
+                    columns = [line.split()[0] for line in lines]
+                    # remove autoincrement id column
+                    updated_columns = [item for item in columns if item != "id"]
+                    # Generate placeholders for values in the query
+                    value_placeholders = ", ".join(["%s"] * len(updated_columns))
 
-        Args:
-            cursor: Cursor object for executing queries.
-            table_name (str): Name of the table in the database.
-            chunk (List[Tuple[str, str, str]]): Chunk of data to be inserted into the database.
-        """
-        # Extract column names from the creation_columns string
-        # Split the string into lines
-        lines = creation_columns.strip().split("\n")
+                    # Generate the INSERT query dynamically
+                    query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
 
-        # Extract column names from each line
-        columns = [line.split()[0] for line in lines]
-        # remove autoincrement id column
-        updated_columns = [item for item in columns if item != "id"]
-        # Generate placeholders for values in the query
-        value_placeholders = ", ".join(["%s"] * len(updated_columns))
+                    # Extract values from the chunk
+                    values = [tuple(row) for row in chunk]  # Convert each row to tuple
 
-        # Generate the INSERT query dynamically
-        query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
+                    # Execute the query with the chunk of data
+                    await cur.executemany(query, values)
+                    await conn.commit()
 
-        # Extract values from the chunk
-        values = [tuple(row) for row in chunk]  # Convert each row to tuple
-
-        # Execute the query with the chunk of data
-        await cursor.executemany(query, values)
+            conn.close()

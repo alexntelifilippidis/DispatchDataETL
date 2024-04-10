@@ -65,15 +65,23 @@ async def main() -> None:
     print("DAT data:", dat_data_transformed)
     print("MySQL data:", mysql_data)
 
+    loop = asyncio.get_event_loop()
     # Load data to source tables
     await mysql_data_loader.load_data_to_db(
-        data=dat_data_transformed, table_name="source_dat", creation_columns=conf.creation_column_dat, chunk_size=conf.chunk_size
+        data=dat_data_transformed,
+        table_name="source_dat",
+        creation_columns=conf.creation_column_dat,
+        chunk_size=conf.chunk_size,
+        loop=loop,
     )
-    print("dat finished")
+
     await mysql_data_loader.load_data_to_db(
-        data=csv_data_transformed, table_name="source_csv", creation_columns=conf.creation_column_csv, chunk_size=conf.chunk_size
+        data=csv_data_transformed,
+        table_name="source_csv",
+        creation_columns=conf.creation_column_csv,
+        chunk_size=conf.chunk_size,
+        loop=loop,
     )
-    print("csv finished")
 
 
 if __name__ == "__main__":
