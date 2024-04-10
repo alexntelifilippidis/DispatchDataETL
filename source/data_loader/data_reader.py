@@ -1,5 +1,6 @@
 import csv
 import datetime
+import os
 from datetime import datetime as dt
 from typing import Any, Dict, List, Tuple, Union
 
@@ -29,7 +30,7 @@ class CSVDataReader(AbstractDataReader):
                 data.append(row[0].split(";"))
         # Move the file after reading
         await move_file(file_path, destination_dir)
-        logger.debug(f"Processed {file_path.split(sep=" / ")[-1]} file")
+        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
     async def transform_data(self, data: List[List[dict]]) -> list[tuple[dict | Any, ...]]:
@@ -81,7 +82,7 @@ class DATDataReader(AbstractDataReader):
                 data.append(line.strip().split(","))
         # Move the file after reading
         await move_file(file_path, destination_dir)
-        logger.debug(f"Processed {file_path.split(sep=" / ")[-1]} file")
+        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
     async def transform_data(self, data: List[List[str]]) -> list[tuple[dict | Any, ...]]:
