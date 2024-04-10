@@ -34,5 +34,7 @@ async def read_all_files(
     Returns:
         list[Any]: A list containing the results of reading data from all files.
     """
+    if dry_run:
+        logger.info("Performing dry run. No file will be moved to destination dir")
     tasks = [reader.read_data(file_path=file_path, destination_dir=destination_dir, dry_run=dry_run) for file_path in file_paths]
     return await asyncio.gather(*tasks)

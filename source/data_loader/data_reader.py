@@ -32,7 +32,7 @@ class CSVDataReader(AbstractDataReader):
         # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
-            logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
+        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
     async def transform_data(self, data: List[List[dict]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:
@@ -87,7 +87,7 @@ class DATDataReader(AbstractDataReader):
         # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
-            logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
+        logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
     async def transform_data(self, data: List[List[str]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:

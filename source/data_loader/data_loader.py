@@ -79,8 +79,8 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                 values = [tuple(row) for row in chunk]  # Convert each row to tuple
 
                 # Log the SQL query without executing it
-                logger.info(f"SQL Query: {query}")
-                logger.info(f"Values: {values}")
+                logger.debug(f"SQL Query: {query}")
+                logger.debug(f"Values: {values}")
         else:
             # Proceed with the normal data insertion operation
             chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
