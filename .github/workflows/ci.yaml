@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set permissions for files
+      - name: Create Files & Set permissions
         run: |
           mkdir -p tests/test_data/test_data_csv_destination
           mkdir -p tests/test_data/test_data_dat_destination
