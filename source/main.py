@@ -9,6 +9,8 @@ from data_loader.utils import logger, my_logger, read_all_files
 
 async def main() -> None:
 
+    logger.info("Starting main process")
+
     csv_file_reader = CSVDataReader()
     dat_file_reader = DATDataReader()
     mysql_data_reader = MySQLDataReader(

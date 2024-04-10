@@ -28,7 +28,7 @@ if env == "test":
     pool_size = 10
     table_name_source = "Packages"
 else:
-    # If the environment is not set to "test"
+    # If the environment is not set to "test" or "dry-run"
     logger.info("Environment is set to Production")
     # Add your non-test configurations or actions here
     dat_dir = "../tests/test_data/test_data_dat"
