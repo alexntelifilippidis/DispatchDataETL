@@ -29,10 +29,10 @@ jobs:
       - name: Install dependencies
         run: |
           # install dependencies
-            pip3 install -U pip wheel setuptools pipenv
-	        pipenv install
+          pip3 install -U pip wheel setuptools pipenv
+          pipenv install
           # activate venv
-            make activate-env
+          make activate-env
 
       - name: Check
         id: check
