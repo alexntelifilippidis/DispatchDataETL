@@ -57,67 +57,56 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
             loop (Any):
             dry_run (bool): Flag indicating whether it's a dry run or not.
         """
-        if dry_run:
-            logger.info("Performing dry run. No data will be inserted into the database.")
-            # Generate and log the SQL queries without executing them
-            chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
-            for chunk in chunks:
-                # Split the string into lines
-                lines = creation_columns.strip().split("\n")
 
-                # Extract column names from each line
-                columns = [line.split()[0] for line in lines]
-                # remove autoincrement id column
-                updated_columns = [item for item in columns if item != "id"]
-                # Generate placeholders for values in the query
-                value_placeholders = ", ".join(["%s"] * len(updated_columns))
+        # Generate and log the SQL queries without executing them
+        chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
+        pool = await aiomysql.create_pool(
+            host=self.host,
+            port=self.port,
+            user=self.user,
+            password=self.password,
+            db=self.db,
+            maxsize=self.pool_size,
+            loop=loop,
+            autocommit=True,
+        )
+        async with pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({creation_columns})")
+                await conn.commit()
+                for chunk in chunks:
+                    # Split the string into lines
+                    lines = creation_columns.strip().split("\n")
 
-                # Generate the INSERT query dynamically
-                query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
+                    # Extract column names from each line
+                    columns = [line.split()[0] for line in lines]
+                    # remove autoincrement id column
+                    updated_columns = [item for item in columns if item != "id"]
+                    # Generate placeholders for values in the query
+                    value_placeholders = ", ".join(["%s"] * len(updated_columns))
 
-                # Extract values from the chunk
-                values = [tuple(row) for row in chunk]  # Convert each row to tuple
+                    # Extract values from the chunk
+                    values = [tuple(row) for row in chunk]  # Convert each row to tuple
 
-                # Log the SQL query without executing it
-                logger.debug(f"SQL Query: {query}")
-                logger.debug(f"Values: {values}")
-        else:
-            # Proceed with the normal data insertion operation
-            chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
-            pool = await aiomysql.create_pool(
-                host=self.host,
-                port=self.port,
-                user=self.user,
-                password=self.password,
-                db=self.db,
-                maxsize=self.pool_size,
-                loop=loop,
-                autocommit=True,
-            )
-            async with pool.acquire() as conn:
-                async with conn.cursor() as cur:
-                    await cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({creation_columns})")
-                    await conn.commit()
-                    for chunk in chunks:
-                        # Split the string into lines
-                        lines = creation_columns.strip().split("\n")
+                    if dry_run:
+                        logger.info("Performing dry run. Data will be inserted into the database but we do rollback.")
 
-                        # Extract column names from each line
-                        columns = [line.split()[0] for line in lines]
-                        # remove autoincrement id column
-                        updated_columns = [item for item in columns if item != "id"]
-                        # Generate placeholders for values in the query
-                        value_placeholders = ", ".join(["%s"] * len(updated_columns))
+                        # Generate the INSERT query dynamically with rollback
+                        query = (
+                            f"START TRANSACTION; INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) "
+                            f"VALUES ({value_placeholders}); ROLLBACK;"
+                        )
 
+                        # Log the SQL query without executing it
+                        logger.debug(f"SQL Query: {query}")
+                        logger.debug(f"Values: {values}")
+                    else:
                         # Generate the INSERT query dynamically
                         query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
 
-                        # Extract values from the chunk
-                        values = [tuple(row) for row in chunk]  # Convert each row to tuple
+                    # Execute the query with the chunk of data
+                    await cur.executemany(query, values)
+                    await conn.commit()
 
-                        # Execute the query with the chunk of data
-                        await cur.executemany(query, values)
-                        await conn.commit()
-
-            conn.close()
-            logger.info(f"Inserted Data to table: {table_name}")
+        conn.close()
+        logger.info(f"Inserted Data to table: {table_name}")
