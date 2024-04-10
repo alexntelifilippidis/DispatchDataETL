@@ -21,15 +21,13 @@ activate-env:
 ## clear all caches
 clear:
 	rm -rf logs
-	rm -rf localstack
+	rm -rf *.log
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
 	rm -rf .coverage
-	rm -rf mutation.sqlite
 	rm -rf report.html
 	rm -rf coverage-reports
 	rm -rf htmlcov
-	rm -rf tests/resources/tmp_configs
 
 ## uninstall all dev packages
 uninstall-dev:
