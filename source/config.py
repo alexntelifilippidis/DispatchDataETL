@@ -2,6 +2,8 @@
 
 import os
 
+from data_loader.utils import logger
+
 # Get the environment variable ENV
 try:
     env = os.environ.get("ENV")
@@ -11,7 +13,7 @@ except KeyError:
 
 if env == "test":
     # If the environment is set to "test"
-    print("Environment is set to Test")
+    logger.info("Environment is set to Test")
     # Add your test-specific configurations or actions here
     dat_dir = "tests/test_data/test_data_dat"
     dat_destination_dir = "tests/test_data/test_data_dat_destination"
@@ -27,7 +29,7 @@ if env == "test":
     table_name_source = "Packages"
 else:
     # If the environment is not set to "test"
-    print("Environment is set to Production")
+    logger.info("Environment is set to Production")
     # Add your non-test configurations or actions here
     dat_dir = "../tests/test_data/test_data_dat"
     dat_destination_dir = "../tests/test_data/test_data_dat_destination"
