@@ -32,9 +32,6 @@ async def test_read_data_csv(expected_csv_data):
     # Assert that data is correctly read
     assert len(data) > 0  # Assuming the file has at least one row of data
     # Assert that the file is moved to the destination directory
-    print("***dest_path*** : ", os.path.join(destination_dir, os.path.basename(csv_file_path)))
-    output = subprocess.check_output("ls -l tests/test_data/", shell=True, stderr=subprocess.STDOUT)
-    print(output.decode("utf-8"))  # Decode bytes to string and print
     assert os.path.exists(os.path.join(destination_dir, os.path.basename(csv_file_path)))
 
     # Move the file back to the original directory
