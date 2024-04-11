@@ -118,15 +118,7 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                                             RowOfData: {values}
                                             CodeError: {te}"""
                         )
-                    except OperationalError as oe:
-                        logger.error(
-                            f"""OperationalError occurred when trying to insert data to DB
-                                            File: {set([item[-1] for item in values])}
-                                            Table: {table_name}
-                                            Query: {query}
-                                            RowOfData: {values}
-                                            CodeError: {oe}"""
-                        )
+                        raise
 
         conn.close()
         logger.info(f"Inserted Data to table: {table_name}")

@@ -70,6 +70,7 @@ class CSVDataReader(AbstractDataReader):
                                                             RowOfData: {item}
                                                             CodeError: {ve}"""
                     )
+                    raise
         return formatted_data
 
 
@@ -131,6 +132,7 @@ class DATDataReader(AbstractDataReader):
                                         RowOfData: {item}
                                         CodeError: {ve}"""
                     )
+                    raise
                 except KeyError as ke:
                     logger.error(
                         f"""KeyError occurred when trying to modify dat data
@@ -138,6 +140,7 @@ class DATDataReader(AbstractDataReader):
                                         RowOfData: {item}
                                         CodeError: {ke}"""
                     )
+                    raise
         return transformed_data  # type: ignore
 
 
@@ -185,28 +188,20 @@ class MySQLDataReader(AbstractDataReader):
         if dry_run:
             logger.info("Performing dry run. No data will be fetched from the database.")
             return []  # Return empty list indicating no data fetched in dry run mode
-        try:
-            async with aiomysql.create_pool(
-                host=self.host,
-                port=self.port,
-                user=self.user,
-                password=self.password,
-                db=self.db,
-                maxsize=self.pool_size,
-            ) as pool:
-                async with pool.acquire() as conn:
-                    async with conn.cursor(aiomysql.DictCursor) as cursor:
-                        await cursor.execute(f"SELECT * FROM {table_name}")
-                        result = await cursor.fetchall()
-                        return result
-        except OperationalError as oe:
-            logger.error(
-                f"""OperationalError occurred when trying to retrieve data
-                        Table: {table_name}
-                        Query: {f"SELECT * FROM {table_name}"}
-                        CodeError: {oe}"""
-            )
-            return []
+
+        async with aiomysql.create_pool(
+            host=self.host,
+            port=self.port,
+            user=self.user,
+            password=self.password,
+            db=self.db,
+            maxsize=self.pool_size,
+        ) as pool:
+            async with pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cursor:
+                    await cursor.execute(f"SELECT * FROM {table_name}")
+                    result = await cursor.fetchall()
+                    return result
 
     async def transform_data(self, data: List[Dict[str, Any]]) -> Any:
         """
