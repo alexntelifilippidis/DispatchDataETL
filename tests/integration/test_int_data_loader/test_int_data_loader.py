@@ -27,6 +27,7 @@ async def test_data_loader_mysql_csv():
             "24",
             "15,28",
             "13,6",
+            "test.csv",
         ],
         [
             "01",
@@ -42,6 +43,7 @@ async def test_data_loader_mysql_csv():
             "24",
             "15,28",
             "13,4",
+            "test.csv",
         ],
     ]
     loop = asyncio.get_event_loop()
@@ -82,6 +84,7 @@ async def test_data_loader_mysql_csv():
             Decimal("24.00"),
             Decimal("15.00"),
             Decimal("13.00"),
+            "test.csv",
         ),
         (
             "01",
@@ -97,6 +100,7 @@ async def test_data_loader_mysql_csv():
             Decimal("24.00"),
             Decimal("15.00"),
             Decimal("13.00"),
+            "test.csv",
         ),
     ]
 
@@ -120,6 +124,7 @@ async def test_data_loader_mysql_dat():
             90.1,
             "700028655189",
             "45",
+            "test.dat",
         ),
         (
             8748,
@@ -135,6 +140,7 @@ async def test_data_loader_mysql_dat():
             22.44,
             "700028665730",
             "35",
+            "test.dat",
         ),
     ]
     loop = asyncio.get_event_loop()
@@ -175,6 +181,7 @@ async def test_data_loader_mysql_dat():
             Decimal("90.10"),
             "700028655189",
             "45",
+            "test.dat",
         ),
         (
             8748,
@@ -190,5 +197,6 @@ async def test_data_loader_mysql_dat():
             Decimal("22.44"),
             "700028665730",
             "35",
+            "test.dat",
         ),
     ]

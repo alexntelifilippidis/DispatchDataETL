@@ -86,6 +86,7 @@ async def test_transform_data_csv(expected_dat_data):
                 "24",
                 "15,28",
                 "13,6",
+                "test.csv",
             ],
             [
                 "01",
@@ -101,6 +102,7 @@ async def test_transform_data_csv(expected_dat_data):
                 "24",
                 "15,28",
                 "13,4",
+                "test.csv",
             ],
         ]
     ]
@@ -123,6 +125,7 @@ async def test_transform_data_csv(expected_dat_data):
             24,
             15.28,
             13.6,
+            "test.csv",
         ),
         (
             "01",
@@ -138,6 +141,7 @@ async def test_transform_data_csv(expected_dat_data):
             24,
             15.28,
             13.4,
+            "test.csv",
         ),
     ]
 

@@ -1,18 +1,11 @@
 # This logger is imported in source/data_loader/utils.py:9
-import asyncio
 import logging
 import sys
 import time
+import traceback
 
-# Color escape codes
-COLORS = {
-    "RESET": "\033[0m",
-    "BOLD": "\033[1m",
-    "RED": "\033[91m",
-    "GREEN": "\033[92m",
-    "YELLOW": "\033[93m",
-    "BLUE": "\033[94m",
-}
+# Define COLORS dictionary if not defined already
+COLORS = {"BLUE": "\033[94m", "GREEN": "\033[92m", "YELLOW": "\033[93m", "RED": "\033[91m", "RESET": "\033[0m"}
 
 
 class MyLogger:
@@ -47,6 +40,9 @@ class MyLogger:
         # Initialize timestamp for time measurement
         self.prev_time = time.time()
 
+        # Set exception hook to log uncaught exceptions
+        sys.excepthook = self.log_uncaught_exception
+
     def get_logger(self) -> logging.Logger:
         """
         Get the logger instance.
@@ -67,6 +63,17 @@ class MyLogger:
         time_elapsed = current_time - self.prev_time
         self.prev_time = current_time
         self.logger.info(f"{message} - Time elapsed since previous log: {time_elapsed:.2f} seconds")
+
+    def log_uncaught_exception(self, exc_type, exc_value, exc_traceback):
+        """
+        Log uncaught exceptions.
+
+        Args:
+            exc_type: The exception type.
+            exc_value: The exception value.
+            exc_traceback: The exception traceback.
+        """
+        self.logger.error("Uncaught exception occurred:", exc_info=(exc_type, exc_value, exc_traceback))
 
 
 # Custom formatter for colored log messages

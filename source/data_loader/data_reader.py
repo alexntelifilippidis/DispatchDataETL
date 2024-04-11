@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Tuple, Union
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataReader
 from data_loader.utils import logger, move_file
+from pymysql import OperationalError
 
 
 class CSVDataReader(AbstractDataReader):
@@ -28,7 +29,7 @@ class CSVDataReader(AbstractDataReader):
         with open(file_path, newline="") as file:
             spamreader = csv.reader(file, delimiter=" ")
             for row in spamreader:
-                data.append(row[0].split(";"))
+                data.append(row[0].split(";") + [f"{os.path.split(file_path)[-1]}"])
         # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
@@ -55,17 +56,17 @@ class CSVDataReader(AbstractDataReader):
                     date_time = datetime.datetime.strptime(date_str, "%Y %m %d %H %M %S")
 
                     # Convert other elements to int or float
-                    converted_elements = [int(item) if item.isdigit() else float(item.replace(",", ".")) for item in sublist[8:]]
+                    converted_elements = [int(item) if item.isdigit() else float(item.replace(",", ".")) for item in sublist[8:-1]]
 
                     # Create tuple and append to formatted_data
                     formatted_data.append(
                         (sublist[0], sublist[1], sublist[2], sublist[3], sublist[4], sublist[5], sublist[6], date_time)
-                        + tuple(converted_elements)
+                        + tuple(converted_elements + [sublist[-1]])
                     )
                 except ValueError as ve:
                     logger.error(
                         f"""ValueError occurred when trying to modify csv data
-                                                            File: .csv
+                                                            File: {sublist[-1]}
                                                             RowOfData: {item}
                                                             CodeError: {ve}"""
                     )
@@ -90,8 +91,8 @@ class DATDataReader(AbstractDataReader):
         data = []
         with open(file_path, "r") as file:
             for line in file:
-                # Custom logic to parse DAT file lines
-                data.append(line.strip().split(","))
+                # Custom logic to parse DAT file lines and add filename
+                data.append(line.strip().split(",") + [f"filename={os.path.split(file_path)[-1]}"])
         # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
@@ -126,14 +127,14 @@ class DATDataReader(AbstractDataReader):
                 except ValueError as ve:
                     logger.error(
                         f"""ValueError occurred when trying to modify dat data
-                                        File: .dat
+                                        File: {item_dict["filename"]}
                                         RowOfData: {item}
                                         CodeError: {ve}"""
                     )
                 except KeyError as ke:
                     logger.error(
                         f"""KeyError occurred when trying to modify dat data
-                                        File: .dat
+                                        File: {item_dict["filename"]}
                                         RowOfData: {item}
                                         CodeError: {ke}"""
                     )
@@ -184,20 +185,28 @@ class MySQLDataReader(AbstractDataReader):
         if dry_run:
             logger.info("Performing dry run. No data will be fetched from the database.")
             return []  # Return empty list indicating no data fetched in dry run mode
-
-        async with aiomysql.create_pool(
-            host=self.host,
-            port=self.port,
-            user=self.user,
-            password=self.password,
-            db=self.db,
-            maxsize=self.pool_size,
-        ) as pool:
-            async with pool.acquire() as conn:
-                async with conn.cursor(aiomysql.DictCursor) as cursor:
-                    await cursor.execute(f"SELECT * FROM {table_name}")
-                    result = await cursor.fetchall()
-                    return result
+        try:
+            async with aiomysql.create_pool(
+                host=self.host,
+                port=self.port,
+                user=self.user,
+                password=self.password,
+                db=self.db,
+                maxsize=self.pool_size,
+            ) as pool:
+                async with pool.acquire() as conn:
+                    async with conn.cursor(aiomysql.DictCursor) as cursor:
+                        await cursor.execute(f"SELECT * FROM {table_name}")
+                        result = await cursor.fetchall()
+                        return result
+        except OperationalError as oe:
+            logger.error(
+                f"""OperationalError occurred when trying to retrieve data
+                        Table: {table_name}
+                        Query: {f"SELECT * FROM {table_name}"}
+                        CodeError: {oe}"""
+            )
+            return []
 
     async def transform_data(self, data: List[Dict[str, Any]]) -> Any:
         """

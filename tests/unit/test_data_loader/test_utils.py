@@ -40,7 +40,7 @@ async def test_read_all_files():
 
     # Asserting the calls to read_data
     expected_calls = [
-        call(file_path=file_paths[0], destination_dir=destination_dir),
-        call(file_path=file_paths[1], destination_dir=destination_dir),
+        call(file_path=file_paths[0], destination_dir=destination_dir, dry_run=False),
+        call(file_path=file_paths[1], destination_dir=destination_dir, dry_run=False),
     ]
     mock_reader.read_data.assert_has_calls(expected_calls)

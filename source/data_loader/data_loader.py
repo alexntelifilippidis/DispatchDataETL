@@ -5,6 +5,7 @@ from typing import Any, List, Tuple
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataLoader
 from data_loader.utils import logger
+from pymysql import OperationalError
 
 
 class MySQLDataLoader(AbstractDataLoader, ABC):
@@ -110,12 +111,21 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                         await conn.commit()
                     except TypeError as te:
                         logger.error(
-                            f"""TypeError occurred when trying to insert data
-                                            File: ?
+                            f"""TypeError occurred when trying to insert data to DB
+                                            File: {set([item[-1] for item in values])}
                                             Table: {table_name}
                                             Query: {query}
                                             RowOfData: {values}
                                             CodeError: {te}"""
+                        )
+                    except OperationalError as oe:
+                        logger.error(
+                            f"""OperationalError occurred when trying to insert data to DB
+                                            File: {set([item[-1] for item in values])}
+                                            Table: {table_name}
+                                            Query: {query}
+                                            RowOfData: {values}
+                                            CodeError: {oe}"""
                         )
 
         conn.close()
