@@ -105,8 +105,18 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                         query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
 
                     # Execute the query with the chunk of data
-                    await cur.executemany(query, values)
-                    await conn.commit()
+                    try:
+                        await cur.executemany(query, values)
+                        await conn.commit()
+                    except TypeError as te:
+                        logger.error(
+                            f"""TypeError occurred when trying to insert data
+                                            File: ?
+                                            Table: {table_name}
+                                            Query: {query}
+                                            RowOfData: {values}
+                                            CodeError: {te}"""
+                        )
 
         conn.close()
         logger.info(f"Inserted Data to table: {table_name}")

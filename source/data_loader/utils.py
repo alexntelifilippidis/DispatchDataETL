@@ -5,7 +5,7 @@ from typing import Any, List
 from data_loader.abstract_data_loader import AbstractDataReader
 from data_loader.logger import MyLogger
 
-my_logger = MyLogger("my_logger")
+my_logger = MyLogger("DDELogger")
 logger = my_logger.get_logger()
 
 

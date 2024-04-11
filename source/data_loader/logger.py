@@ -31,14 +31,14 @@ class MyLogger:
         file_handler = logging.FileHandler(log_file)
 
         # Create a stream handler for terminal output
-        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler = logging.StreamHandler(stream=sys.stdout)
 
         # Create a formatter
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
         # Set formatter for file handler and stream handler
         file_handler.setFormatter(formatter)
-        stream_handler.setFormatter(ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s"))
+        stream_handler.setFormatter(ColoredFormatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
         # Add the file handler and stream handler to the logger
         self.logger.addHandler(file_handler)

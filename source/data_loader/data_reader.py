@@ -49,18 +49,26 @@ class CSVDataReader(AbstractDataReader):
         formatted_data = []
         for item in data:
             for sublist in item:
-                # Convert date string to datetime object
-                date_str = sublist[7].replace("-", " ").replace("_", " ").replace("-", " ").replace(":", " ")
-                date_time = datetime.datetime.strptime(date_str, "%Y %m %d %H %M %S")
+                try:
+                    # Convert date string to datetime object
+                    date_str = sublist[7].replace("-", " ").replace("_", " ").replace("-", " ").replace(":", " ")
+                    date_time = datetime.datetime.strptime(date_str, "%Y %m %d %H %M %S")
 
-                # Convert other elements to int or float
-                converted_elements = [int(item) if item.isdigit() else float(item.replace(",", ".")) for item in sublist[8:]]
+                    # Convert other elements to int or float
+                    converted_elements = [int(item) if item.isdigit() else float(item.replace(",", ".")) for item in sublist[8:]]
 
-                # Create tuple and append to formatted_data
-                formatted_data.append(
-                    (sublist[0], sublist[1], sublist[2], sublist[3], sublist[4], sublist[5], sublist[6], date_time)
-                    + tuple(converted_elements)
-                )
+                    # Create tuple and append to formatted_data
+                    formatted_data.append(
+                        (sublist[0], sublist[1], sublist[2], sublist[3], sublist[4], sublist[5], sublist[6], date_time)
+                        + tuple(converted_elements)
+                    )
+                except ValueError as ve:
+                    logger.error(
+                        f"""ValueError occurred when trying to modify csv data
+                                                            File: .csv
+                                                            RowOfData: {item}
+                                                            CodeError: {ve}"""
+                    )
         return formatted_data
 
 
@@ -108,12 +116,27 @@ class DATDataReader(AbstractDataReader):
                 for pair in item:
                     key, value = pair.split("=")
                     item_dict[key.strip()] = value.strip()
-                # Convert specific values to int, float, or datetime
-                item_dict["Sequence"] = int(item_dict["Sequence"])  # type: ignore
-                item_dict["WT"] = float(item_dict["WT"])  # type: ignore
-                item_dict["VOLUME"] = float(item_dict["VOLUME"])  # type: ignore
-                item_dict["DATETIME"] = dt.strptime(item_dict["DATETIME"], "%Y%m%d%H%M%S")  # type: ignore
-                transformed_data.append(tuple(item_dict.values()))
+                try:
+                    # Convert specific values to int, float, or datetime
+                    item_dict["Sequence"] = int(item_dict["Sequence"])  # type: ignore
+                    item_dict["WT"] = float(item_dict["WT"])  # type: ignore
+                    item_dict["VOLUME"] = float(item_dict["VOLUME"])  # type: ignore
+                    item_dict["DATETIME"] = dt.strptime(item_dict["DATETIME"], "%Y%m%d%H%M%S")  # type: ignore
+                    transformed_data.append(tuple(item_dict.values()))
+                except ValueError as ve:
+                    logger.error(
+                        f"""ValueError occurred when trying to modify dat data
+                                        File: .dat
+                                        RowOfData: {item}
+                                        CodeError: {ve}"""
+                    )
+                except KeyError as ke:
+                    logger.error(
+                        f"""KeyError occurred when trying to modify dat data
+                                        File: .dat
+                                        RowOfData: {item}
+                                        CodeError: {ke}"""
+                    )
         return transformed_data  # type: ignore
 
 
