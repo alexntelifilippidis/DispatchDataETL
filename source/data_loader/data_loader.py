@@ -1,11 +1,9 @@
-import asyncio
 from abc import ABC
 from typing import Any, List, Tuple
 
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataLoader
 from data_loader.utils import logger
-from pymysql import OperationalError
 
 
 class MySQLDataLoader(AbstractDataLoader, ABC):

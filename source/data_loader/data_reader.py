@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Tuple, Union
 import aiomysql
 from data_loader.abstract_data_loader import AbstractDataReader
 from data_loader.utils import logger, move_file
-from pymysql import OperationalError
 
 
 class CSVDataReader(AbstractDataReader):
