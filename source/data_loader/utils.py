@@ -1,6 +1,6 @@
 import asyncio
 import shutil
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from data_loader.abstract_data_loader import AbstractDataReader
 from data_loader.logger import MyLogger
@@ -29,10 +29,12 @@ async def read_all_files(
     Parameters:
         reader (AbstractDataReader): An instance of a class that implements the AbstractDataReader interface.
         file_paths (list[str]): A list of file paths to read.
+        destination_dir: (str): The destination dir path
         dry_run (bool): Flag indicating whether it's a dry run or not.
 
     Returns:
         list[Any]: A list containing the results of reading data from all files.
+
     """
     if dry_run:
         logger.info("Performing dry run. No file will be moved to destination dir")
