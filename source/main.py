@@ -71,8 +71,9 @@ async def main(dry_run: bool) -> None:
     await my_logger.log_with_time_elapsed("Finish data transforming process")
     logger.info("Starting data ingestion to Source DBs")
 
-    loop = asyncio.get_event_loop()
     # Load data to source tables
+    loop = asyncio.get_event_loop()
+
     await mysql_data_loader.load_data_to_db(
         data=dat_data_transformed,
         table_name="source_dat",
