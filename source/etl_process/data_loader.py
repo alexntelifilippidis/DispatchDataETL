@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, List, Tuple
+from typing import Any
 
 import aiomysql
 from etl_process.abstract_data_loader import AbstractDataLoader
@@ -21,13 +21,18 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
         """
         Initialize MySQLDataLoader.
 
-        Args:
-            host (str): MySQL host address.
-            port (int): MySQL port number.
-            user (str): MySQL username.
-            password (str): MySQL password.
-            db (str): MySQL database name.
-            pool_size (int): Connection pool size (default is 5).
+        :param host: MySQL host address.
+        :type host: str
+        :param port: MySQL port number.
+        :type port: int
+        :param user: MySQL username.
+        :type user: str
+        :param password: MySQL password.
+        :type password: str
+        :param db: MySQL database name.
+        :type db: str
+        :param pool_size: Connection pool size (default is 5).
+        :type pool_size: int, optional
         """
         self.host = host
         self.port = port
@@ -48,16 +53,20 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
         """
         Insert data into MySQL database asynchronously.
 
-        Args:
-            data (List[Tuple[str, str, str]]): List of tuples containing data to be inserted into the database.
-            table_name (str): Name of the table in the database.
-            chunk_size (int): How many lines will ingest to table
-            creation_columns (str): all the columns that I need to add for create the table:
-            loop (Any):
-            dry_run (bool): Flag indicating whether it's a dry run or not.
+        :param data: List of tuples containing data to be inserted into the database.
+        :type data: List[Tuple[Union[dict, Any], ...]]
+        :param table_name: Name of the table in the database.
+        :type table_name: str
+        :param creation_columns: all the columns that I need to add for create the table
+        :type creation_columns: str
+        :param chunk_size: How many lines will ingest to table
+        :type chunk_size: int
+        :param loop: asyncio event loop
+        :type loop: Any
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :raises TypeError: If there is a type error occurred during data insertion.
         """
-
-        # Generate and log the SQL queries without executing them
         chunks = [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
         pool = await aiomysql.create_pool(
             host=self.host,
@@ -74,36 +83,22 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                 await cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({creation_columns})")
                 await conn.commit()
                 for chunk in chunks:
-                    # Split the string into lines
                     lines = creation_columns.strip().split("\n")
-
-                    # Extract column names from each line
                     columns = [line.split()[0] for line in lines]
-                    # remove autoincrement id column
                     updated_columns = [item for item in columns if item != "id"]
-                    # Generate placeholders for values in the query
                     value_placeholders = ", ".join(["%s"] * len(updated_columns))
-
-                    # Extract values from the chunk
-                    values = [tuple(row) for row in chunk]  # Convert each row to tuple
+                    values = [tuple(row) for row in chunk]
 
                     if dry_run:
                         logger.info("Performing dry run. Data will be inserted into the database but we do rollback.")
-
-                        # Generate the INSERT query dynamically with rollback
                         query = (
                             f"START TRANSACTION; INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) "
                             f"VALUES ({value_placeholders}); ROLLBACK;"
                         )
-
-                        # Log the SQL query without executing it
                         logger.debug(f"SQL Query: {query}")
                         logger.debug(f"Values: {values}")
                     else:
-                        # Generate the INSERT query dynamically
                         query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
-
-                    # Execute the query with the chunk of data
                     try:
                         await cur.executemany(query, values)
                         await conn.commit()
@@ -116,6 +111,5 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                                             RowOfData: {values}
                                             CodeError: {te}"""
                         )
-
         conn.close()
         logger.info(f"Inserted Data to table: {table_name}")

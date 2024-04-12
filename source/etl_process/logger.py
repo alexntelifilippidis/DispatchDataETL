@@ -1,4 +1,3 @@
-# This logger is imported in source/etl_process/utils.py:9
 import logging
 import sys
 import time
@@ -19,9 +18,10 @@ class MyLogger:
         """
         Initialize the logger.
 
-        Args:
-            name: The name of the logger.
-            log_file: The path to the log file. Defaults to 'logfile.log'.
+        :param name: The name of the logger.
+        :type name: str
+        :param log_file: The path to the log file. Defaults to 'logfile.log'.
+        :type log_file: str, optional
         """
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
@@ -53,8 +53,8 @@ class MyLogger:
         """
         Get the logger instance.
 
-        Returns:
-            The logger instance.
+        :return: The logger instance.
+        :rtype: logging.Logger
         """
         return self.logger
 
@@ -62,8 +62,8 @@ class MyLogger:
         """
         Log a message with the time elapsed since the previous log.
 
-        Args:
-            message: The message to log.
+        :param message: The message to log.
+        :type message: str
         """
         current_time = time.time()
         time_elapsed = current_time - self.prev_time
@@ -74,10 +74,12 @@ class MyLogger:
         """
         Log uncaught exceptions.
 
-        Args:
-            exc_type: The exception type.
-            exc_value: The exception value.
-            exc_traceback: The exception traceback.
+        :param exc_type: The exception type.
+        :type exc_type: Exception
+        :param exc_value: The exception value.
+        :type exc_value: Exception
+        :param exc_traceback: The exception traceback.
+        :type exc_traceback: traceback
         """
         self.logger.error("Uncaught exception occurred:", exc_info=(exc_type, exc_value, exc_traceback))
 

@@ -109,7 +109,7 @@ async def test_transform_data_csv(expected_dat_data):
     csv_reader = CSVDataReader()
 
     # Read data from the CSV file
-    result = await csv_reader.transform_data(data=data)
+    result, corrupted_files_result = await csv_reader.transform_data(data=data)
     expected_result = [
         (
             "01",
@@ -144,8 +144,9 @@ async def test_transform_data_csv(expected_dat_data):
             "test.csv",
         ),
     ]
-
+    expected_corrupted_files_result = []
     assert result == expected_result
+    assert corrupted_files_result == expected_corrupted_files_result
 
 
 @pytest.mark.asyncio
@@ -188,7 +189,7 @@ async def test_transform_data_dat(expected_dat_data):
     dat_reader = DATDataReader()
 
     # Read data from the CSV file
-    result = await dat_reader.transform_data(data=data)
+    result, corrupted_files_result = await dat_reader.transform_data(data=data)
     expected_result = [
         (
             8747,
@@ -222,4 +223,6 @@ async def test_transform_data_dat(expected_dat_data):
         ),
     ]
 
+    expected_corrupted_files_result = []
     assert result == expected_result
+    assert corrupted_files_result == expected_corrupted_files_result

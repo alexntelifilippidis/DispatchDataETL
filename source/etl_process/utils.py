@@ -14,9 +14,10 @@ async def move_file(source_path: str, destination_dir: str) -> None:
     """
     Move a file asynchronously from a source path to a destination path.
 
-    Parameters:
-        source_path (str): The path of the file to move.
-        destination_dir (str): The path where the file should be moved to.
+    :param source_path: The path of the file to move.
+    :type source_path: str
+    :param destination_dir: The path where the file should be moved to.
+    :type destination_dir: str
     """
     shutil.move(source_path, destination_dir)
 
@@ -27,15 +28,15 @@ async def read_all_files(
     """
     Read data from all files asynchronously.
 
-    Parameters:
-        reader (AbstractDataReader): An instance of a class that implements the AbstractDataReader interface.
-        file_paths (list[str]): A list of file paths to read.
-        destination_dir: (str): The destination dir path
-        dry_run (bool): Flag indicating whether it's a dry run or not.
-
-    Returns:
-        list[Any]: A list containing the results of reading data from all files.
-
+    :param reader: An instance of a class that implements the AbstractDataReader interface.
+    :type reader: AbstractDataReader
+    :param file_paths: A list of file paths to read.
+    :type file_paths: list[str]
+    :param destination_dir: The destination dir path
+    :type destination_dir: str
+    :param dry_run: Flag indicating whether it's a dry run or not.
+    :type dry_run: bool
+    :return: A list containing the results of reading data from all files.
     """
     if dry_run:
         logger.info("Performing dry run. No file will be moved to destination dir")
@@ -57,16 +58,19 @@ async def check_files(
     Remove all data from the corrupted files.
     Move the corrupted files to another folder.
 
-    Parameters:
-        reader (AbstractDataReader): An instance of a class that implements the AbstractDataReader interface.
-        data (List[Tuple]): A list of tuples, each containing data in the specified format.
-        corrupted_files (List): A list with the corrupted files come from reader.transform_data.
-        file_path (str): The path to the DAT file to read.
-        destination_dir (str): The path to move the DAT file to after reading.
-        dry_run (bool): Flag indicating whether it's a dry run or not.
-
-    Returns:
-        List[str]: A list of clean data.
+    :param reader: An instance of a class that implements the AbstractDataReader interface.
+    :type reader: AbstractDataReader
+    :param data: A list of tuples, each containing data in the specified format.
+    :type data: List[Tuple]
+    :param corrupted_files: A list with the corrupted files come from reader.transform_data.
+    :type corrupted_files: List
+    :param file_path: The path to the DAT file to read.
+    :type file_path: str
+    :param destination_dir: The path to move the DAT file to after reading.
+    :type destination_dir: str
+    :param dry_run: Flag indicating whether it's a dry run or not.
+    :type dry_run: bool
+    :return: A list of clean data.
     """
     tasks = [reader.check_data(data_tuple) for data_tuple in data]
     results = await asyncio.gather(*tasks)

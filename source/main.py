@@ -8,7 +8,12 @@ from etl_process.utils import check_files, logger, my_logger, read_all_files
 
 
 async def main(dry_run: bool) -> None:
+    """
+    The main process function that orchestrates the ETL process.
 
+    :param dry_run: Flag indicating whether it's a dry run or not.
+    :type dry_run: bool
+    """
     logger.info("Starting main process")
 
     csv_file_reader = CSVDataReader()

@@ -16,20 +16,20 @@ class CSVDataReader(AbstractDataReader):
         """
         Read data from a CSV file asynchronously and move it to a destination path.
 
-        Parameters:
-            file_path (str): The path to the CSV file to read.
-            destination_dir (str): The path to move the CSV file to after reading.
-            dry_run (bool): Flag indicating whether it's a dry run or not.
-
-        Returns:
-            List[Dict[str, Any]]: The data read from the CSV file.
+        :param file_path: The path to the CSV file to read.
+        :type file_path: str
+        :param destination_dir: The path to move the CSV file to after reading.
+        :type destination_dir: str
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :return: The data read from the CSV file.
+        :rtype: list[list[str]]
         """
         data = []
         with open(file_path, newline="") as file:
             spamreader = csv.reader(file, delimiter=" ")
             for row in spamreader:
                 data.append(row[0].split(";") + [f"{os.path.split(file_path)[-1]}"])
-        # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
         logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
@@ -39,26 +39,21 @@ class CSVDataReader(AbstractDataReader):
         """
         Parse the provided data and convert values to appropriate types.
 
-        Parameters:
-            data (List[List[dict]]): A list containing sublists of dictionaries with string values.
-            dry_run (bool): Flag indicating whether it's a dry run or not.
-
-        Returns:
-            List[Tuple[datetime, Union[int, float, str]]]: A list of tuples where values are converted to appropriate types.
+        :param data: A list containing sublists of dictionaries with string values.
+        :type data: List[List[dict]]
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :return: A list of tuples where values are converted to appropriate types.
+        :rtype: tuple[list[tuple[Any]], list[Any]]
         """
         formatted_data = []
         corrupted_files = []
         for item in data:
             for sublist in item:
                 try:
-                    # Convert date string to datetime object
                     date_str = sublist[7].replace("-", " ").replace("_", " ").replace("-", " ").replace(":", " ")
                     date_time = datetime.datetime.strptime(date_str, "%Y %m %d %H %M %S")
-
-                    # Convert other elements to int or float
                     converted_elements = [int(item) if item.isdigit() else float(item.replace(",", ".")) for item in sublist[8:-1]]
-
-                    # Create tuple and append to formatted_data
                     formatted_data.append(
                         (sublist[0], sublist[1], sublist[2], sublist[3], sublist[4], sublist[5], sublist[6], date_time)
                         + tuple(converted_elements + [sublist[-1]])
@@ -86,13 +81,12 @@ class CSVDataReader(AbstractDataReader):
         """
         Check the format and content of the provided CSV line asynchronously.
 
-        Parameters:
-            line (Tuple): A tuple containing the CSV data in the specified format.
-
-        Returns:
-            str: The filename if the data is invalid, otherwise an empty string.
+        :param line: A tuple containing the CSV data in the specified format.
+        :type line: Tuple
+        :return: The filename if the data is invalid, otherwise an empty string.
+        :rtype: str
         """
-        expected_length = 14  # Expected length of the tuple
+        expected_length = 14
         expected_types = [
             str,
             str,
@@ -108,16 +102,14 @@ class CSVDataReader(AbstractDataReader):
             Union[float, int],
             Union[float, int],
             str,
-        ]  # Expected types for each element
-
+        ]
         if len(line) != expected_length:
-            return line[-1]  # Return filename if length is wrong
-
+            return line[-1]
         for value, expected_type in zip(line, expected_types):
             if not isinstance(value, expected_type):  # type: ignore
-                return line[-1]  # Return filename if type is wrong
+                return line[-1]
 
-        return ""  # Data is valid
+        return ""
 
 
 class DATDataReader(AbstractDataReader):
@@ -127,20 +119,19 @@ class DATDataReader(AbstractDataReader):
         """
         Read data from a DAT file asynchronously and move it to a destination path.
 
-        Parameters:
-            file_path (str): The path to the DAT file to read.
-            destination_dir (str): The path to move the DAT file to after reading.
-            dry_run (bool): Flag indicating whether it's a dry run or not.
-
-        Returns:
-            List[List[str]]: A list of lists, where each inner list represents a row of data read from the DAT file.
+        :param file_path: The path to the DAT file to read.
+        :type file_path: str
+        :param destination_dir: The path to move the DAT file to after reading.
+        :type destination_dir: str
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :return: A list of lists, where each inner list represents a row of data read from the DAT file.
+        :rtype: List[List[str]]
         """
         data = []
         with open(file_path, "r") as file:
             for line in file:
-                # Custom logic to parse DAT file lines and add filename
                 data.append(line.strip().split(",") + [f"filename={os.path.split(file_path)[-1]}"])
-        # Move the file after reading
         if not dry_run:
             await move_file(file_path, destination_dir)
         logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
@@ -150,13 +141,12 @@ class DATDataReader(AbstractDataReader):
         """
         Transform the provided data into a list of dictionaries.
 
-        Parameters:
-            data (List[List[str]]): A list containing sublists of strings with key-value pairs.
-            dry_run (bool): Flag indicating whether it's a dry run or not.
-
-        Returns:
-            tuple[
-        list[tuple[str | Any, ...]], list[str]]: A list where each sublist contains dictionaries with key-value pairs.
+        :param data: A list containing sublists of strings with key-value pairs.
+        :type data: List[List[str]]
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :return: A list where each sublist contains dictionaries with key-value pairs.
+        :rtype: tuple[list[tuple[str | Any, ...]], list[str]]
         """
         transformed_data = []
         corrupted_files = []
@@ -167,7 +157,6 @@ class DATDataReader(AbstractDataReader):
                     key, value = pair.split("=")
                     item_dict[key.strip()] = value.strip()
                 try:
-                    # Convert specific values to int, float, or datetime
                     item_dict["Sequence"] = int(item_dict["Sequence"])  # type: ignore
                     item_dict["WT"] = float(item_dict["WT"])  # type: ignore
                     item_dict["VOLUME"] = float(item_dict["VOLUME"])  # type: ignore
@@ -184,7 +173,9 @@ class DATDataReader(AbstractDataReader):
                 except KeyError as ke:
                     logger.error(
                         f"""KeyError occurred when trying to modify dat data
-                                        File: {item_dict["filename"]}
+                                        File: {
+
+item_dict["filename"]}
                                         RowOfData: {item}
                                         CodeError: {ke}"""
                     )
@@ -195,13 +186,12 @@ class DATDataReader(AbstractDataReader):
         """
         Check the format and content of the provided data tuple.
 
-        Parameters:
-            data (Tuple): A tuple containing the data in the specified format.
-
-        Returns:
-            str: The filename if the data is invalid, otherwise an empty string.
+        :param data: A tuple containing the data in the specified format.
+        :type data: Tuple
+        :return: The filename if the data is invalid, otherwise an empty string.
+        :rtype: str
         """
-        expected_length = 14  # Expected length of the tuple
+        expected_length = 14
         expected_types = [
             int,
             str,
@@ -217,16 +207,13 @@ class DATDataReader(AbstractDataReader):
             str,
             str,
             str,
-        ]  # Expected types for each element
-
+        ]
         if len(data) != expected_length:
-            return data[-1]  # Return filename if length is wrong
-
+            return data[-1]
         for value, expected_type in zip(data, expected_types):
             if not isinstance(value, expected_type):
-                return data[-1]  # Return filename if type is wrong
-
-        return ""  # Data is valid
+                return data[-1]
+        return ""
 
 
 class MySQLDataReader(AbstractDataReader):
@@ -244,13 +231,18 @@ class MySQLDataReader(AbstractDataReader):
         """
         Initialize MySQLDataReader.
 
-        Args:
-            host (str): MySQL host address.
-            port (int): MySQL port number.
-            user (str): MySQL username.
-            password (str): MySQL password.
-            db (str): MySQL database name.
-            pool_size (int): Connection pool size (default is 5).
+        :param host: MySQL host address.
+        :type host: str
+        :param port: MySQL port number.
+        :type port: int
+        :param user: MySQL username.
+        :type user: str
+        :param password: MySQL password.
+        :type password: str
+        :param db: MySQL database name.
+        :type db: str
+        :param pool_size: Connection pool size (default is 5).
+        :type pool_size: int, optional
         """
         self.host = host
         self.port = port
@@ -263,17 +255,16 @@ class MySQLDataReader(AbstractDataReader):
         """
         Read data from MySQL database asynchronously.
 
-        Args:
-            table_name (str): Name of the table in the database.
-            dry_run (bool): Flag indicating whether it's a dry run or not.
-
-        Returns:
-            List[Tuple]: List of tuples containing the data read from the database.
+        :param table_name: Name of the table in the database.
+        :type table_name: str
+        :param dry_run: Flag indicating whether it's a dry run or not.
+        :type dry_run: bool, optional
+        :return: List of tuples containing the data read from the database.
+        :rtype: List[Tuple]
         """
         if dry_run:
             logger.info("Performing dry run. No data will be fetched from the database.")
-            return []  # Return empty list indicating no data fetched in dry run mode
-
+            return []
         async with aiomysql.create_pool(
             host=self.host,
             port=self.port,
