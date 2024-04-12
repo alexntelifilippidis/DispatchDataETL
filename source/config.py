@@ -2,7 +2,7 @@
 
 import os
 
-from data_loader.utils import logger
+from etl_process.utils import logger
 
 # Get the environment variable ENV
 try:
@@ -18,8 +18,10 @@ if env == "test":
     dry_run = False
     dat_dir = "tests/test_data/test_data_dat"
     dat_destination_dir = "tests/test_data/test_data_dat_destination"
+    corrupted_dat_destination_dir = "tests/test_data/test_data_dat_corrupted_destination"
     csv_dir = "tests/test_data/test_data_csv"
     csv_destination_dir = "tests/test_data/test_data_csv_destination"
+    corrupted_csv_destination_dir = "tests/test_data/test_data_csv_corrupted_destination"
     chunk_size = 50
     host = "localhost"
     port = 3306
@@ -32,11 +34,13 @@ else:
     # If the environment is not set to "test" or "dry-run"
     logger.info("Environment is set to Production")
     # Add your non-test configurations or actions here
-    dry_run = False
+    dry_run = True
     dat_dir = "../tests/test_data/test_data_dat"
     dat_destination_dir = "../tests/test_data/test_data_dat_destination"
+    corrupted_dat_destination_dir = "../tests/test_data/test_data_dat_corrupted_destination"
     csv_dir = "../tests/test_data/test_data_csv"
     csv_destination_dir = "../tests/test_data/test_data_csv_destination"
+    corrupted_csv_destination_dir = "../tests/test_data/test_data_csv_corrupted_destination"
     chunk_size = 100
     host = "localhost"
     port = 3306
@@ -46,7 +50,7 @@ else:
     pool_size = 10
     table_name_source = "Packages"
 
-# the lines need to be above each other to work source/data_loader/data_loader.py:80
+# the lines need to be above each other to work source/etl_process/etl_process.py:80
 creation_column_csv = """  
     data_01 VARCHAR(255),
     data_02 VARCHAR(255),
@@ -61,6 +65,7 @@ creation_column_csv = """
     Width DECIMAL(10,2),
     Weight DECIMAL(10,2),
     data_13 DECIMAL(10,2),
+    source_filename VARCHAR(255),
     id INT AUTO_INCREMENT PRIMARY KEY
 """
 creation_column_dat = """
@@ -77,5 +82,6 @@ creation_column_dat = """
     volume DECIMAL(10, 2),
     b VARCHAR(255),
     chk VARCHAR(255),
+    source_filename VARCHAR(255),
     id INT AUTO_INCREMENT PRIMARY KEY
 """

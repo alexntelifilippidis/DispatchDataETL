@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, call, patch
 
 import pytest
-from data_loader.utils import move_file, read_all_files
+from etl_process.utils import move_file, read_all_files
 
 
 @pytest.mark.asyncio

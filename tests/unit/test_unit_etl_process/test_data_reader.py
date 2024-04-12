@@ -4,8 +4,8 @@ import subprocess
 from decimal import Decimal
 
 import pytest
-from data_loader.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
-from data_loader.utils import move_file
+from etl_process.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
+from etl_process.utils import move_file
 
 
 @pytest.mark.asyncio

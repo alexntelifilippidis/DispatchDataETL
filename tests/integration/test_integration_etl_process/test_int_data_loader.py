@@ -5,7 +5,7 @@ from decimal import Decimal
 import aiomysql
 import pytest
 from conftest import query_and_delete_data
-from data_loader.data_loader import MySQLDataLoader
+from etl_process.data_loader import MySQLDataLoader
 
 
 @pytest.mark.asyncio

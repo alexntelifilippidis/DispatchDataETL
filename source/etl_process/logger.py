@@ -1,10 +1,17 @@
-# This logger is imported in source/data_loader/utils.py:9
+# This logger is imported in source/etl_process/utils.py:9
 import logging
 import sys
 import time
 
 # Define COLORS dictionary if not defined already
-COLORS = {"BLUE": "\033[94m", "GREEN": "\033[92m", "YELLOW": "\033[93m", "RED": "\033[91m", "RESET": "\033[0m"}
+COLORS = {
+    "BLUE": "\033[94m",
+    "GREEN": "\033[92m",
+    "YELLOW": "\033[93m",
+    "RED": "\033[91m",
+    "ORANGE": "\033[38;5;208m",  # ANSI escape code for orange color
+    "RESET": "\033[0m",
+}
 
 
 class MyLogger:
@@ -85,7 +92,7 @@ class ColoredFormatter(logging.Formatter):
         elif level == "INFO":
             return f'{COLORS["GREEN"]}{msg}{COLORS["RESET"]}'
         elif level == "WARNING":
-            return f'{COLORS["YELLOW"]}{msg}{COLORS["RESET"]}'
+            return f'{COLORS["ORANGE"]}{msg}{COLORS["RESET"]}'
         elif level == "ERROR" or level == "CRITICAL":
             return f'{COLORS["RED"]}{msg}{COLORS["RESET"]}'
         else:

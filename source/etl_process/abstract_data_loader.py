@@ -15,6 +15,11 @@ class AbstractDataReader(ABC):
         """Transform data asynchronously."""
         pass
 
+    @abstractmethod
+    async def check_data(self, **kwargs) -> Any:
+        """Check if data is in the correct format asynchronously."""
+        pass
+
 
 class AbstractDataLoader(ABC):
     """Abstract class for loading data into a database."""

@@ -5,8 +5,8 @@ from datetime import datetime as dt
 from typing import Any, Dict, List, Tuple, Union
 
 import aiomysql
-from data_loader.abstract_data_loader import AbstractDataReader
-from data_loader.utils import logger, move_file
+from etl_process.abstract_data_loader import AbstractDataReader
+from etl_process.utils import logger, move_file
 
 
 class CSVDataReader(AbstractDataReader):
@@ -35,7 +35,7 @@ class CSVDataReader(AbstractDataReader):
         logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
-    async def transform_data(self, data: List[List[dict]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:
+    async def transform_data(self, data: List[List[dict]], dry_run: bool = False) -> tuple[list[tuple[Any]], list[Any]]:
         """
         Parse the provided data and convert values to appropriate types.
 
@@ -47,6 +47,7 @@ class CSVDataReader(AbstractDataReader):
             List[Tuple[datetime, Union[int, float, str]]]: A list of tuples where values are converted to appropriate types.
         """
         formatted_data = []
+        corrupted_files = []
         for item in data:
             for sublist in item:
                 try:
@@ -65,12 +66,58 @@ class CSVDataReader(AbstractDataReader):
                 except ValueError as ve:
                     logger.error(
                         f"""ValueError occurred when trying to modify csv data
-                                                            File: {sublist[-1]}
-                                                            RowOfData: {item}
-                                                            CodeError: {ve}"""
+                                              File: {sublist[-1]}
+                                              RowOfData: {item}
+                                              CodeError: {ve}"""
                     )
-                    raise
-        return formatted_data
+                    corrupted_files.append(sublist[-1])
+                except AttributeError as ae:
+                    logger.error(
+                        f"""AttributeError occurred when trying to modify csv data
+                                              File: {sublist[-1]}
+                                              RowOfData: {item}
+                                              CodeError: {ae}"""
+                    )
+                    corrupted_files.append(sublist[-1])
+
+        return formatted_data, list(set(corrupted_files))
+
+    async def check_data(self, line: Tuple) -> str:
+        """
+        Check the format and content of the provided CSV line asynchronously.
+
+        Parameters:
+            line (Tuple): A tuple containing the CSV data in the specified format.
+
+        Returns:
+            str: The filename if the data is invalid, otherwise an empty string.
+        """
+        expected_length = 14  # Expected length of the tuple
+        expected_types = [
+            str,
+            str,
+            str,
+            str,
+            str,
+            str,
+            str,
+            datetime.datetime,
+            Union[float, int],
+            Union[float, int],
+            Union[float, int],
+            Union[float, int],
+            Union[float, int],
+            str,
+        ]  # Expected types for each element
+
+        if len(line) != expected_length:
+            return line[-1]  # Return filename if length is wrong
+
+        for value, expected_type in zip(line, expected_types):
+            if not isinstance(value, expected_type):  # type: ignore
+                return line[-1]  # Return filename if type is wrong
+
+        return ""  # Data is valid
 
 
 class DATDataReader(AbstractDataReader):
@@ -99,7 +146,7 @@ class DATDataReader(AbstractDataReader):
         logger.debug(f"Processed {os.path.split(file_path)[-1]} file")
         return data
 
-    async def transform_data(self, data: List[List[str]], dry_run: bool = False) -> list[tuple[dict | Any, ...]]:
+    async def transform_data(self, data: List[List[str]], dry_run: bool = False) -> tuple[list[tuple[str | Any, ...]], list[str]]:
         """
         Transform the provided data into a list of dictionaries.
 
@@ -108,9 +155,11 @@ class DATDataReader(AbstractDataReader):
             dry_run (bool): Flag indicating whether it's a dry run or not.
 
         Returns:
-            List[List[dict]]: A list where each sublist contains dictionaries with key-value pairs.
+            tuple[
+        list[tuple[str | Any, ...]], list[str]]: A list where each sublist contains dictionaries with key-value pairs.
         """
         transformed_data = []
+        corrupted_files = []
         for sublist in data:
             for item in sublist:
                 item_dict = {}
@@ -131,7 +180,7 @@ class DATDataReader(AbstractDataReader):
                                         RowOfData: {item}
                                         CodeError: {ve}"""
                     )
-                    raise
+                    corrupted_files.append(sublist[-1])
                 except KeyError as ke:
                     logger.error(
                         f"""KeyError occurred when trying to modify dat data
@@ -139,8 +188,45 @@ class DATDataReader(AbstractDataReader):
                                         RowOfData: {item}
                                         CodeError: {ke}"""
                     )
-                    raise
-        return transformed_data  # type: ignore
+                    corrupted_files.append(sublist[-1])
+        return transformed_data, list(set(corrupted_files))
+
+    async def check_data(self, data: Tuple) -> str:
+        """
+        Check the format and content of the provided data tuple.
+
+        Parameters:
+            data (Tuple): A tuple containing the data in the specified format.
+
+        Returns:
+            str: The filename if the data is invalid, otherwise an empty string.
+        """
+        expected_length = 14  # Expected length of the tuple
+        expected_types = [
+            int,
+            str,
+            str,
+            datetime.datetime,
+            str,
+            str,
+            float,
+            str,
+            str,
+            str,
+            float,
+            str,
+            str,
+            str,
+        ]  # Expected types for each element
+
+        if len(data) != expected_length:
+            return data[-1]  # Return filename if length is wrong
+
+        for value, expected_type in zip(data, expected_types):
+            if not isinstance(value, expected_type):
+                return data[-1]  # Return filename if type is wrong
+
+        return ""  # Data is valid
 
 
 class MySQLDataReader(AbstractDataReader):
@@ -202,10 +288,10 @@ class MySQLDataReader(AbstractDataReader):
                     result = await cursor.fetchall()
                     return result
 
-    async def transform_data(self, data: List[Dict[str, Any]]) -> Any:
-        """
+    async def transform_data(self) -> Any:
+        """ """
+        pass
 
-        :param kwargs:
-        :return:
-        """
+    async def check_data(self) -> Any:
+        """ """
         pass

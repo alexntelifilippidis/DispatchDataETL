@@ -149,7 +149,7 @@ The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) 
 ├── .github                     # Directory for GitHub actions
 │   └── workflows               # Directory for GitHub actions workflows
 ├── source                      # Directory where all your source code exists
-│   ├── data_loader             # Directory for all etl classes
+│   ├── etl_process             # Directory for all etl classes
 │   ├── config.py               # Config file for the source code
 │   └── main.py                 # The running file           
 ├── tests                       # Directory for all tests

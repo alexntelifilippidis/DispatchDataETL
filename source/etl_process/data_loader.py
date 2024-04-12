@@ -2,8 +2,8 @@ from abc import ABC
 from typing import Any, List, Tuple
 
 import aiomysql
-from data_loader.abstract_data_loader import AbstractDataLoader
-from data_loader.utils import logger
+from etl_process.abstract_data_loader import AbstractDataLoader
+from etl_process.utils import logger
 
 
 class MySQLDataLoader(AbstractDataLoader, ABC):
@@ -116,7 +116,6 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                                             RowOfData: {values}
                                             CodeError: {te}"""
                         )
-                        raise
 
         conn.close()
         logger.info(f"Inserted Data to table: {table_name}")
