@@ -49,8 +49,8 @@ jobs:
         run: |
           cd source/docs
           ls
-          ls __build
-          ls __build.html
+          ls _build
+          ls _build.html
           make html
           ghp-import -n -p -f docs/_build/html
 
