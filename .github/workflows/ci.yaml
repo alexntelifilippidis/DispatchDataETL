@@ -44,6 +44,18 @@ jobs:
           pipenv requirements > requirements.txt --dev
           pip install -r requirements.txt
 
+      - name: Built HTML docs
+        id: built_html_docs
+        run: |
+          cd source/docs
+          make html
+          ghp-import -n -p -f docs/_build/html
+
+      - name: Run ghp-import
+        id: run_ghp_import
+        run: |
+          ghp-import -n -p -f source/docs/_build/html
+
       - name: Check
         id: check
         run: |
@@ -68,9 +80,4 @@ jobs:
           echo "Clearing caches"
           make clear
 
-      - name: Deploy Sphinx Doc
-        id: deploy_doc
-        run: |
-          cd source
-          make html
-          ghp-import -n -p -f docs/_build/html
+      
