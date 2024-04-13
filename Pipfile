@@ -8,6 +8,7 @@ aiomysql = "==0.2.0"
 cryptography = "*"
 anyio = "*"
 sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [dev-packages]
 pre-commit = "==3.7.0"
