@@ -44,16 +44,12 @@ jobs:
           pipenv requirements > requirements.txt --dev
           pip install -r requirements.txt
 
-      - name: Built HTML docs
-        id: built_html_docs
+      - name: Deploy HTML docs in GH pages
+        id: deploy_html_docs
         run: |
           cd source/docs
           make html
-
-      - name: Run ghp-import
-        id: run_ghp_import
-        run: |
-          ghp-import -n -p -f source/docs/_build/html.
+          ghp-import -n -p -f docs/_build/html
 
       - name: Check
         id: check
