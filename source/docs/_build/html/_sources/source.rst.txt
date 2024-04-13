@@ -1,0 +1,37 @@
+source package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   source.etl_process
+
+Submodules
+----------
+
+source.config module
+--------------------
+
+.. automodule:: source.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+source.main module
+------------------
+
+.. automodule:: source.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: source
+   :members:
+   :undoc-members:
+   :show-inheritance:

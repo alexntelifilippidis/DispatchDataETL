@@ -1,3 +1,39 @@
+"""
+Module-level docstring for configuration and environment setup.
+
+This module handles the configuration settings and environment setup for the ETL process.
+It checks the environment variable 'ENV' to determine the environment type and sets
+configurations accordingly. If 'ENV' is set to 'test', it configures the settings for
+the test environment, otherwise, it configures settings for the production environment.
+
+Test Environment Configuration:
+- Directories for data files are set to test directories.
+- Database connection settings are configured for the test environment.
+
+Production Environment Configuration:
+- Directories for data files are set to production directories.
+- Database connection settings are configured for the production environment.
+
+Attributes:
+    dry_run (bool): Flag indicating whether it's a dry run or not.
+    dat_dir (str): Directory for DAT files.
+    dat_destination_dir (str): Destination directory for DAT files.
+    corrupted_dat_destination_dir (str): Directory for corrupted DAT files.
+    csv_dir (str): Directory for CSV files.
+    csv_destination_dir (str): Destination directory for CSV files.
+    corrupted_csv_destination_dir (str): Directory for corrupted CSV files.
+    chunk_size (int): Size of data chunks for processing.
+    host (str): Database host.
+    port (int): Database port.
+    user (str): Database user.
+    password (str): Database password.
+    db (str): Database name.
+    pool_size (int): Size of the database connection pool.
+    table_name_source (str): Name of the source table in the database.
+    creation_column_csv (str): SQL column definitions for CSV files.
+    creation_column_dat (str): SQL column definitions for DAT files.
+"""
+
 # Assuming there's an environment variable named ENV that stores the environment information
 
 import os

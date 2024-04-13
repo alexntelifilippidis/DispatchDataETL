@@ -67,3 +67,10 @@ jobs:
           
           echo "Clearing caches"
           make clear
+
+      - name: Deploy Sphinx Doc
+        id: deploy_doc
+        run: |
+          cd source
+          make html
+          ghp-import -n -p -f docs/_build/html

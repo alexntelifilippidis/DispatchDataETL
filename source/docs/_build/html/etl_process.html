@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>etl_process package &mdash; DispatchDataETL 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="main module" href="main.html" />
+    <link rel="prev" title="config module" href="config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DispatchDataETL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">source</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">etl_process package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process.abstract_data_loader">etl_process.abstract_data_loader module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataLoader"><code class="docutils literal notranslate"><span class="pre">AbstractDataLoader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader"><code class="docutils literal notranslate"><span class="pre">AbstractDataReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process.data_loader">etl_process.data_loader module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.data_loader.MySQLDataLoader"><code class="docutils literal notranslate"><span class="pre">MySQLDataLoader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process.data_reader">etl_process.data_reader module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.data_reader.CSVDataReader"><code class="docutils literal notranslate"><span class="pre">CSVDataReader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.data_reader.DATDataReader"><code class="docutils literal notranslate"><span class="pre">DATDataReader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.data_reader.MySQLDataReader"><code class="docutils literal notranslate"><span class="pre">MySQLDataReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process.logger">etl_process.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.logger.ColoredFormatter"><code class="docutils literal notranslate"><span class="pre">ColoredFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.logger.MyLogger"><code class="docutils literal notranslate"><span class="pre">MyLogger</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process.utils">etl_process.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.utils.check_files"><code class="docutils literal notranslate"><span class="pre">check_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.utils.move_file"><code class="docutils literal notranslate"><span class="pre">move_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#etl_process.utils.read_all_files"><code class="docutils literal notranslate"><span class="pre">read_all_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-etl_process">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DispatchDataETL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">source</a></li>
+      <li class="breadcrumb-item active">etl_process package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/etl_process.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="etl-process-package">
+<h1>etl_process package<a class="headerlink" href="#etl-process-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-etl_process.abstract_data_loader">
+<span id="etl-process-abstract-data-loader-module"></span><h2>etl_process.abstract_data_loader module<a class="headerlink" href="#module-etl_process.abstract_data_loader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.abstract_data_loader.</span></span><span class="sig-name descname"><span class="pre">AbstractDataLoader</span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract class for loading data into a database.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataLoader.load_data_to_db">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_data_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataLoader.load_data_to_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataLoader.load_data_to_db" title="Link to this definition"></a></dt>
+<dd><p>Load data into a database asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em>) – Additional keyword arguments for loading data</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>DatabaseError</strong> – If there is an error while loading data into the database</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.abstract_data_loader.</span></span><span class="sig-name descname"><span class="pre">AbstractDataReader</span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract class for reading data asynchronously.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataReader.check_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataReader.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataReader.check_data" title="Link to this definition"></a></dt>
+<dd><p>Check if data is in the correct format asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Checked data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataReader.read_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataReader.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataReader.read_data" title="Link to this definition"></a></dt>
+<dd><p>Read data asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Data read from a source</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.abstract_data_loader.AbstractDataReader.transform_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/etl_process/abstract_data_loader.html#AbstractDataReader.transform_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.abstract_data_loader.AbstractDataReader.transform_data" title="Link to this definition"></a></dt>
+<dd><p>Transform data asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Transformed data</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-etl_process.data_loader">
+<span id="etl-process-data-loader-module"></span><h2>etl_process.data_loader module<a class="headerlink" href="#module-etl_process.data_loader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.data_loader.MySQLDataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.data_loader.</span></span><span class="sig-name descname"><span class="pre">MySQLDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/data_loader.html#MySQLDataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_loader.MySQLDataLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataLoader" title="etl_process.abstract_data_loader.AbstractDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataLoader</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Class for loading data into MySQL database asynchronously.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_loader.MySQLDataLoader.load_data_to_db">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_data_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/etl_process/data_loader.html#MySQLDataLoader.load_data_to_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_loader.MySQLDataLoader.load_data_to_db" title="Link to this definition"></a></dt>
+<dd><p>Insert data into MySQL database asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>dict</em><em>, </em><em>Any</em><em>]</em><em>, </em><em>...</em><em>]</em><em>]</em>) – List of tuples containing data to be inserted into the database.</p></li>
+<li><p><strong>table_name</strong> (<em>str</em>) – Name of the table in the database.</p></li>
+<li><p><strong>creation_columns</strong> (<em>str</em>) – all the columns that I need to add for create the table</p></li>
+<li><p><strong>chunk_size</strong> (<em>int</em>) – How many lines will ingest to table</p></li>
+<li><p><strong>loop</strong> (<em>Any</em>) – asyncio event loop</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If there is a type error occurred during data insertion.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-etl_process.data_reader">
+<span id="etl-process-data-reader-module"></span><h2>etl_process.data_reader module<a class="headerlink" href="#module-etl_process.data_reader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.data_reader.CSVDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.data_reader.</span></span><span class="sig-name descname"><span class="pre">CSVDataReader</span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#CSVDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.CSVDataReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataReader</span></code></a></p>
+<p>Class for reading data from CSV files asynchronously.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.CSVDataReader.check_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#CSVDataReader.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.CSVDataReader.check_data" title="Link to this definition"></a></dt>
+<dd><p>Check the format and content of the provided CSV line asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>line</strong> (<em>Tuple</em>) – A tuple containing the CSV data in the specified format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The filename if the data is invalid, otherwise an empty string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.CSVDataReader.read_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#CSVDataReader.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.CSVDataReader.read_data" title="Link to this definition"></a></dt>
+<dd><p>Read data from a CSV file asynchronously and move it to a destination path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the CSV file to read.</p></li>
+<li><p><strong>destination_dir</strong> (<em>str</em>) – The path to move the CSV file to after reading.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data read from the CSV file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.CSVDataReader.transform_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#CSVDataReader.transform_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.CSVDataReader.transform_data" title="Link to this definition"></a></dt>
+<dd><p>Parse the provided data and convert values to appropriate types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>dict</em><em>]</em><em>]</em>) – A list containing sublists of dictionaries with string values.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples where values are converted to appropriate types.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list[tuple[Any]], list[Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.data_reader.DATDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.data_reader.</span></span><span class="sig-name descname"><span class="pre">DATDataReader</span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#DATDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.DATDataReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataReader</span></code></a></p>
+<p>Class for reading data from DAT files asynchronously.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.DATDataReader.check_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#DATDataReader.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.DATDataReader.check_data" title="Link to this definition"></a></dt>
+<dd><p>Check the format and content of the provided data tuple.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Tuple</em>) – A tuple containing the data in the specified format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The filename if the data is invalid, otherwise an empty string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.DATDataReader.read_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#DATDataReader.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.DATDataReader.read_data" title="Link to this definition"></a></dt>
+<dd><p>Read data from a DAT file asynchronously and move it to a destination path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the DAT file to read.</p></li>
+<li><p><strong>destination_dir</strong> (<em>str</em>) – The path to move the DAT file to after reading.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of lists, where each inner list represents a row of data read from the DAT file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.DATDataReader.transform_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#DATDataReader.transform_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.DATDataReader.transform_data" title="Link to this definition"></a></dt>
+<dd><p>Transform the provided data into a list of dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – A list containing sublists of strings with key-value pairs.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list where each sublist contains dictionaries with key-value pairs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list[tuple[str | Any, …]], list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.data_reader.MySQLDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.data_reader.</span></span><span class="sig-name descname"><span class="pre">MySQLDataReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/data_reader.html#MySQLDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.MySQLDataReader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataReader</span></code></a></p>
+<p>Class for reading data from MySQL database asynchronously.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.MySQLDataReader.check_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#MySQLDataReader.check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.MySQLDataReader.check_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.MySQLDataReader.read_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#MySQLDataReader.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.MySQLDataReader.read_data" title="Link to this definition"></a></dt>
+<dd><p>Read data from MySQL database asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_name</strong> (<em>str</em>) – Name of the table in the database.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of tuples containing the data read from the database.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.data_reader.MySQLDataReader.transform_data">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/etl_process/data_reader.html#MySQLDataReader.transform_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.data_reader.MySQLDataReader.transform_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-etl_process.logger">
+<span id="etl-process-logger-module"></span><h2>etl_process.logger module<a class="headerlink" href="#module-etl_process.logger" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.logger.ColoredFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.logger.</span></span><span class="sig-name descname"><span class="pre">ColoredFormatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/logger.html#ColoredFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.ColoredFormatter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Formatter</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.logger.ColoredFormatter.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/logger.html#ColoredFormatter.format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.ColoredFormatter.format" title="Link to this definition"></a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="etl_process.logger.MyLogger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.logger.</span></span><span class="sig-name descname"><span class="pre">MyLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'logfile.log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/logger.html#MyLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.MyLogger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.logger.MyLogger.get_logger">
+<span class="sig-name descname"><span class="pre">get_logger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Logger</span></span></span><a class="reference internal" href="_modules/etl_process/logger.html#MyLogger.get_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.MyLogger.get_logger" title="Link to this definition"></a></dt>
+<dd><p>Get the logger instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The logger instance.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>logging.Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.logger.MyLogger.log_uncaught_exception">
+<span class="sig-name descname"><span class="pre">log_uncaught_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_traceback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/etl_process/logger.html#MyLogger.log_uncaught_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.MyLogger.log_uncaught_exception" title="Link to this definition"></a></dt>
+<dd><p>Log uncaught exceptions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exc_type</strong> (<em>Exception</em>) – The exception type.</p></li>
+<li><p><strong>exc_value</strong> (<em>Exception</em>) – The exception value.</p></li>
+<li><p><strong>exc_traceback</strong> (<em>traceback</em>) – The exception traceback.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="etl_process.logger.MyLogger.log_with_time_elapsed">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_with_time_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/etl_process/logger.html#MyLogger.log_with_time_elapsed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.logger.MyLogger.log_with_time_elapsed" title="Link to this definition"></a></dt>
+<dd><p>Log a message with the time elapsed since the previous log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – The message to log.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-etl_process.utils">
+<span id="etl-process-utils-module"></span><h2>etl_process.utils module<a class="headerlink" href="#module-etl_process.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="etl_process.utils.check_files">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.utils.</span></span><span class="sig-name descname"><span class="pre">check_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><span class="pre">AbstractDataReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrupted_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/utils.html#check_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.utils.check_files" title="Link to this definition"></a></dt>
+<dd><p>Check the format and content of the provided data tuples.
+Remove all data from the corrupted files.
+Move the corrupted files to another folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reader</strong> (<a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><em>AbstractDataReader</em></a>) – An instance of a class that implements the AbstractDataReader interface.</p></li>
+<li><p><strong>data</strong> (<em>List</em><em>[</em><em>Tuple</em><em>]</em>) – A list of tuples, each containing data in the specified format.</p></li>
+<li><p><strong>corrupted_files</strong> (<em>List</em>) – A list with the corrupted files come from reader.transform_data.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the DAT file to read.</p></li>
+<li><p><strong>destination_dir</strong> (<em>str</em>) – The path to move the DAT file to after reading.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of clean data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl_process.utils.move_file">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.utils.</span></span><span class="sig-name descname"><span class="pre">move_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/etl_process/utils.html#move_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.utils.move_file" title="Link to this definition"></a></dt>
+<dd><p>Move a file asynchronously from a source path to a destination path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_path</strong> (<em>str</em>) – The path of the file to move.</p></li>
+<li><p><strong>destination_dir</strong> (<em>str</em>) – The path where the file should be moved to.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="etl_process.utils.read_all_files">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">etl_process.utils.</span></span><span class="sig-name descname"><span class="pre">read_all_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><span class="pre">AbstractDataReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/etl_process/utils.html#read_all_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#etl_process.utils.read_all_files" title="Link to this definition"></a></dt>
+<dd><p>Read data from all files asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reader</strong> (<a class="reference internal" href="#etl_process.abstract_data_loader.AbstractDataReader" title="etl_process.abstract_data_loader.AbstractDataReader"><em>AbstractDataReader</em></a>) – An instance of a class that implements the AbstractDataReader interface.</p></li>
+<li><p><strong>file_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of file paths to read.</p></li>
+<li><p><strong>destination_dir</strong> (<em>str</em>) – The destination dir path</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – Flag indicating whether it’s a dry run or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the results of reading data from all files.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-etl_process">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-etl_process" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config.html" class="btn btn-neutral float-left" title="config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="main.html" class="btn btn-neutral float-right" title="main module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Alexandros Ntelifilippidis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
