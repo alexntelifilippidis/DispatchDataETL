@@ -1,5 +1,6 @@
 # DispatchDataETL
 
+1. [Code Documantation](#code-documentation)
 1. [Setup](#setup)
 2. [Configuration](#configuration)
 3. [Testing](#testing)
@@ -9,6 +10,10 @@
 4. [CI/CD](#cicd)
     1. [CI](#ci)
 5. [Code Structure](#code-structure)
+
+
+## Code Documantation
+Documentation for the code exists here: [GitHubPage](https://alexntelifilippidis.github.io/DispatchDataETL/)
 
 ## Setup
 
@@ -137,6 +142,7 @@ The CI/CD pipeline is configured in the [GitHub actions](.github/workflows) file
 The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) file.
 
 - It is triggered on every push to the main branch and in every pull request(pr).
+- It deploys sphinx doc to GitHub pages ([how to do it](https://redandgreen.co.uk/sphinx-to-github-pages-via-github-actions/python-code/))
 - It runs unit testing and the integration testing.
 - It also runs the pre-commit hooks to ensure that the code is formatted correctly and that the tests pass before
   pushing to the main branch.
@@ -149,10 +155,13 @@ The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) 
 ├── .github                     # Directory for GitHub actions
 │   └── workflows               # Directory for GitHub actions workflows
 ├── source                      # Directory where all your source code exists
+│   ├── docs                    # Directory that created from sphinx and manages the html doc that exists in github
 │   ├── etl_process             # Directory for all etl classes
 │   ├── config.py               # Config file for the source code
 │   └── main.py                 # The running file           
 ├── tests                       # Directory for all tests
+│   ├── sql_scripts             # Directory init sql script for test db
+│   ├── test_data               # Directory with test data for the tests
 │   ├── unit                    # Directory for unit tests
 │   └── integration             # Directory for integration tests
 ├── .gitignore                  # File for ignoring files in git
