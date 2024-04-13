@@ -48,6 +48,9 @@ jobs:
         id: deploy_html_docs
         run: |
           cd source/docs
+          ls
+          ls __build
+          ls __build.html
           make html
           ghp-import -n -p -f docs/_build/html
 
