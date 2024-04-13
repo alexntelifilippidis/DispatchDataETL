@@ -49,7 +49,7 @@ jobs:
         run: |
           cd source/docs
           make html
-          ghp-import -n -p -f docs/_build/html/.
+          ghp-import -n -p -f docs/_build/html
 
       - name: Check
         id: check
