@@ -9,6 +9,7 @@ cryptography = "*"
 anyio = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
+ghp-import = "*"
 
 [dev-packages]
 pre-commit = "==3.7.0"
