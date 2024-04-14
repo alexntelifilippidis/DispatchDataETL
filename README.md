@@ -1,6 +1,6 @@
 # DispatchDataETL
 
-1. [Code Documantation](#code-documentation)
+1. [Code Documentation](#code-documentation)
 1. [Setup](#setup)
 2. [Configuration](#configuration)
 3. [Testing](#testing)
@@ -12,7 +12,7 @@
 5. [Code Structure](#code-structure)
 
 
-## Code Documantation
+## Code Documentation
 Documentation for the code exists here: [GitHubPage](https://alexntelifilippidis.github.io/DispatchDataETL/)
 
 ## Setup

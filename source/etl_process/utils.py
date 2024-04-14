@@ -45,7 +45,7 @@ async def read_all_files(
     return results
 
 
-async def check_files(
+async def check_all_files(
     reader: AbstractDataReader,
     data: List[Tuple],
     corrupted_files: List,

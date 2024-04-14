@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, call, patch
 
 import pytest
-from etl_process.utils import move_file, read_all_files
+from etl_process.utils import check_all_files, move_file, read_all_files
 
 
 @pytest.mark.asyncio
@@ -44,3 +44,30 @@ async def test_read_all_files():
         call(file_path=file_paths[1], destination_dir=destination_dir, dry_run=False),
     ]
     mock_reader.read_data.assert_has_calls(expected_calls)
+
+
+@pytest.mark.asyncio
+async def test_check_all_files():
+    reader = AsyncMock()
+    reader.check_data.return_value = ["file1.dat"]
+    data = [(1, 2, "file1.dat"), (4, 5, "file2.dat")]
+    corrupted_files = []
+    file_path = "/path/to/file"
+    destination_dir = "/path/to/destination"
+
+    # Test with clean data
+    reader.check_data.return_value = []
+    clean_data = await check_all_files(reader, data, corrupted_files, file_path, destination_dir)
+    assert clean_data == data
+
+    # Test with corrupted data
+    reader.check_data.return_value = ["file1.dat"]
+    corrupted_files = [""]
+    clean_data = await check_all_files(reader, data, corrupted_files, file_path, destination_dir)
+    assert clean_data == [(4, 5, "file2.dat")]
+    assert corrupted_files == ["file1.dat"]
+
+    # Test file movement
+    with patch("my_module.move_file") as move_file_mock:
+        await check_all_files(reader, data, corrupted_files, file_path, destination_dir, dry_run=False)
+        move_file_mock.assert_called_once_with("/path/to/file/file1.dat", "/path/to/destination")

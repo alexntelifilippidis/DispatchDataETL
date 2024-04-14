@@ -226,3 +226,99 @@ async def test_transform_data_dat(expected_dat_data):
     expected_corrupted_files_result = []
     assert result == expected_result
     assert corrupted_files_result == expected_corrupted_files_result
+
+
+@pytest.mark.asyncio
+async def test_check_data_correct_dat():
+    input_data = (
+        8747,
+        "PATRA",
+        "1",
+        datetime.datetime(2023, 10, 20, 12, 23, 40),
+        "kg",
+        "0000",
+        18.66,
+        "cm",
+        "0000",
+        "85.0X 53.0X 20.0",
+        90.1,
+        "700028655189",
+        "45",
+        "20231020152446.dat",
+    )
+    dat_reader = DATDataReader()
+    actual_results = await dat_reader.check_data(data=input_data)
+    expected_results = ""
+    assert actual_results == expected_results
+
+
+@pytest.mark.asyncio
+async def test_check_data_wrong_dat():
+    input_data = (
+        8747,
+        "PATRA",
+        "1",
+        datetime.datetime(2023, 10, 20, 12, 23, 40),
+        "kg",
+        "0000",
+        18.66,
+        "cm",
+        "0000",
+        "85.0X 53.0X 20.0",
+        90.1,
+        "700028655189",
+        "45",
+        "20231020152446.dat",
+    )
+    dat_reader = DATDataReader()
+    actual_results = await dat_reader.check_data(data=input_data)
+    expected_results = "20231020152446.dat"
+    assert actual_results == expected_results
+
+
+@pytest.mark.asyncio
+async def test_check_data_correct_csv():
+    input_data = (
+        "01",
+        "01",
+        "19112930098",
+        "67254036AY",
+        "700025218874",
+        "1685623517595_700025218874_01-06-2023-15-45-17.jpeg",
+        "1685623517595_700025218874_01-06-2023-15-45-17_C.jpeg",
+        datetime.datetime(2023, 6, 1, 15, 45, 17),
+        42,
+        13.5,
+        24,
+        15.28,
+        13.6,
+        "01062023_155202_01_01_19112930098.csv",
+    )
+    csv_reader = CSVDataReader()
+    actual_results = await csv_reader.check_data(line=input_data)
+    expected_results = ""
+    assert actual_results == expected_results
+
+
+@pytest.mark.asyncio
+async def test_check_data_wrong_csv():
+    input_data = (
+        1,
+        "01",
+        "19112930098",
+        "67254036AY",
+        "700025218874",
+        "1685623517595_700025218874_01-06-2023-15-45-17.jpeg",
+        "1685623517595_700025218874_01-06-2023-15-45-17_C.jpeg",
+        datetime.datetime(2023, 6, 1, 15, 45, 17),
+        42,
+        13.5,
+        24,
+        15.28,
+        13.6,
+        "01062023_155202_01_01_19112930098.csv",
+    )
+    csv_reader = CSVDataReader()
+    actual_results = await csv_reader.check_data(line=input_data)
+    expected_results = "01062023_155202_01_01_19112930098.csv"
+    assert actual_results == expected_results

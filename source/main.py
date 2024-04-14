@@ -4,7 +4,7 @@ import os
 import config as conf
 from etl_process.data_loader import MySQLDataLoader
 from etl_process.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
-from etl_process.utils import check_files, logger, my_logger, read_all_files
+from etl_process.utils import check_all_files, logger, my_logger, read_all_files
 
 
 async def main(dry_run: bool) -> None:
@@ -79,7 +79,7 @@ async def main(dry_run: bool) -> None:
 
     # Check data
     # Gather file reading tasks
-    csv_check_task = check_files(
+    csv_check_task = check_all_files(
         reader=csv_file_reader,
         data=csv_data_transformed,
         corrupted_files=corrupted_csv_files,
@@ -87,7 +87,7 @@ async def main(dry_run: bool) -> None:
         destination_dir=conf.corrupted_csv_destination_dir,
         dry_run=dry_run,
     )
-    dat_check_task = check_files(
+    dat_check_task = check_all_files(
         reader=dat_file_reader,
         data=dat_data_transformed,
         corrupted_files=corrupted_dat_files,
@@ -105,7 +105,7 @@ async def main(dry_run: bool) -> None:
     loop = asyncio.get_event_loop()
 
     await mysql_data_loader.load_data_to_db(
-        data=dat_data_transformed,
+        data=csv_data_checked,
         table_name="source_dat",
         creation_columns=conf.creation_column_dat,
         chunk_size=conf.chunk_size,
@@ -114,7 +114,7 @@ async def main(dry_run: bool) -> None:
     )
 
     await mysql_data_loader.load_data_to_db(
-        data=csv_data_transformed,
+        data=dat_data_checked,
         table_name="source_csv",
         creation_columns=conf.creation_column_csv,
         chunk_size=conf.chunk_size,
