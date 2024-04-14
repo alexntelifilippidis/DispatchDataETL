@@ -11,6 +11,9 @@ Welcome to DispatchDataETL's documentation!
    :caption: Contents:
 
    modules
+   ExternalResources
+   CHANGELOG
+
 
 Indices and tables
 ==================

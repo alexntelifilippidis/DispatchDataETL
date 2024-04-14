@@ -44,6 +44,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -77,7 +78,7 @@
 <span class="kn">import</span> <span class="nn">config</span> <span class="k">as</span> <span class="nn">conf</span>
 <span class="kn">from</span> <span class="nn">etl_process.data_loader</span> <span class="kn">import</span> <span class="n">MySQLDataLoader</span>
 <span class="kn">from</span> <span class="nn">etl_process.data_reader</span> <span class="kn">import</span> <span class="n">CSVDataReader</span><span class="p">,</span> <span class="n">DATDataReader</span><span class="p">,</span> <span class="n">MySQLDataReader</span>
-<span class="kn">from</span> <span class="nn">etl_process.utils</span> <span class="kn">import</span> <span class="n">check_files</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">my_logger</span><span class="p">,</span> <span class="n">read_all_files</span>
+<span class="kn">from</span> <span class="nn">etl_process.utils</span> <span class="kn">import</span> <span class="n">check_all_files</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">my_logger</span><span class="p">,</span> <span class="n">read_all_files</span>
 
 
 <div class="viewcode-block" id="main">
@@ -154,7 +155,7 @@
 
     <span class="c1"># Check data</span>
     <span class="c1"># Gather file reading tasks</span>
-    <span class="n">csv_check_task</span> <span class="o">=</span> <span class="n">check_files</span><span class="p">(</span>
+    <span class="n">csv_check_task</span> <span class="o">=</span> <span class="n">check_all_files</span><span class="p">(</span>
         <span class="n">reader</span><span class="o">=</span><span class="n">csv_file_reader</span><span class="p">,</span>
         <span class="n">data</span><span class="o">=</span><span class="n">csv_data_transformed</span><span class="p">,</span>
         <span class="n">corrupted_files</span><span class="o">=</span><span class="n">corrupted_csv_files</span><span class="p">,</span>
@@ -162,7 +163,7 @@
         <span class="n">destination_dir</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">corrupted_csv_destination_dir</span><span class="p">,</span>
         <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">dat_check_task</span> <span class="o">=</span> <span class="n">check_files</span><span class="p">(</span>
+    <span class="n">dat_check_task</span> <span class="o">=</span> <span class="n">check_all_files</span><span class="p">(</span>
         <span class="n">reader</span><span class="o">=</span><span class="n">dat_file_reader</span><span class="p">,</span>
         <span class="n">data</span><span class="o">=</span><span class="n">dat_data_transformed</span><span class="p">,</span>
         <span class="n">corrupted_files</span><span class="o">=</span><span class="n">corrupted_dat_files</span><span class="p">,</span>
@@ -180,7 +181,7 @@
     <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
 
     <span class="k">await</span> <span class="n">mysql_data_loader</span><span class="o">.</span><span class="n">load_data_to_db</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">dat_data_transformed</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">csv_data_checked</span><span class="p">,</span>
         <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;source_dat&quot;</span><span class="p">,</span>
         <span class="n">creation_columns</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">creation_column_dat</span><span class="p">,</span>
         <span class="n">chunk_size</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
@@ -189,7 +190,7 @@
     <span class="p">)</span>
 
     <span class="k">await</span> <span class="n">mysql_data_loader</span><span class="o">.</span><span class="n">load_data_to_db</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">csv_data_transformed</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">dat_data_checked</span><span class="p">,</span>
         <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;source_csv&quot;</span><span class="p">,</span>
         <span class="n">creation_columns</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">creation_column_csv</span><span class="p">,</span>
         <span class="n">chunk_size</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
