@@ -255,7 +255,7 @@ async def test_check_data_correct_dat():
 @pytest.mark.asyncio
 async def test_check_data_wrong_dat():
     input_data = (
-        8747,
+        "8747",
         "PATRA",
         "1",
         datetime.datetime(2023, 10, 20, 12, 23, 40),

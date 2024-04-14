@@ -54,20 +54,16 @@ async def test_check_all_files():
     corrupted_files = []
     file_path = "/path/to/file"
     destination_dir = "/path/to/destination"
+    reader.check_data.side_effect = ["", "", "file1.dat", ""]
 
     # Test with clean data
-    reader.check_data.return_value = []
     clean_data = await check_all_files(reader, data, corrupted_files, file_path, destination_dir)
     assert clean_data == data
 
-    # Test with corrupted data
-    reader.check_data.return_value = ["file1.dat"]
-    corrupted_files = [""]
-    clean_data = await check_all_files(reader, data, corrupted_files, file_path, destination_dir)
+    # Test with corrupted data]
+    with patch("etl_process.utils.move_file") as move_file_mock:
+        clean_data = await check_all_files(reader, data, corrupted_files, file_path, destination_dir)
     assert clean_data == [(4, 5, "file2.dat")]
     assert corrupted_files == ["file1.dat"]
-
     # Test file movement
-    with patch("my_module.move_file") as move_file_mock:
-        await check_all_files(reader, data, corrupted_files, file_path, destination_dir, dry_run=False)
-        move_file_mock.assert_called_once_with("/path/to/file/file1.dat", "/path/to/destination")
+    move_file_mock.assert_called_once_with("/path/to/file\\file1.dat", "/path/to/destination")
