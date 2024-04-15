@@ -14,6 +14,9 @@ async def main(dry_run: bool) -> None:
     :param dry_run: Flag indicating whether it's a dry run or not.
     :type dry_run: bool
     """
+    # =====================
+    #     Bronze Layer
+    # =====================
     logger.info("Starting main process")
 
     csv_file_reader = CSVDataReader()
@@ -123,6 +126,10 @@ async def main(dry_run: bool) -> None:
     )
 
     await my_logger.log_with_time_elapsed("Finish data ingestion to Source DBs")
+
+    # =====================
+    #     Silver Layer
+    # =====================
 
 
 if __name__ == "__main__":
