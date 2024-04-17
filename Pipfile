@@ -7,6 +7,11 @@ name = "pypi"
 aiomysql = "==0.2.0"
 cryptography = "*"
 anyio = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+ghp-import = "*"
+aiofiles = "*"
+types-aiofiles = "*"
 
 [dev-packages]
 pre-commit = "==3.7.0"
@@ -15,7 +20,6 @@ black = "==24.3.0"
 mypy = "==1.9.0"
 pytest = "==8.1.1"
 pytest-asyncio = "*"
-
 pytest-cov = "*"
 
 [requires]

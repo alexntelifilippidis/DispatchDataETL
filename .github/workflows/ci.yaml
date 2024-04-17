@@ -67,3 +67,11 @@ jobs:
           
           echo "Clearing caches"
           make clear
+
+      - name: Deploy HTML docs in GH pages
+        id: deploy_html_docs
+        run: |
+          cd source/docs
+          make html
+          ghp-import -n -p -f _build/html
+      

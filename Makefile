@@ -1,5 +1,4 @@
-.PHONY: install-dev install-prod activate-env start-db stop-db devserver prodserver clean check format tests
-
+.PHONY: install-dev install-prod activate-env start-db stop-db devserver prodserver clean check format tests drop-image build-image integration-environment integration-teardown integration-tests unit help
 ## ATTENTION! activate virtual environment before running!
 
 ##  install packages, install pre-commit dev
@@ -22,6 +21,7 @@ activate-env:
 clear:
 	rm -rf logs
 	rm -rf *.log
+	rm -rf tests/*.log
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
 	rm -rf .coverage

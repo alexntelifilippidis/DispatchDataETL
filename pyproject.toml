@@ -29,7 +29,6 @@ omit = ["*/__init__.py",
     ".git"
 ]
 
-
 [tool.mypy]
 ignore_missing_imports = true
 namespace_packages = true
