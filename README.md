@@ -1,4 +1,6 @@
 # DispatchDataETL
+This repository contains a Python code provides a data pipeline for fetching, deduplicating, 
+and inserting data from various sources such as CSV, DAT, and SQL into a silver layer.
 
 1. [Code Documentation](#code-documentation)
 1. [Setup](#setup)
@@ -13,6 +15,7 @@
 
 
 ## Code Documentation
+
 Documentation for the code exists here: [GitHubPage](https://alexntelifilippidis.github.io/DispatchDataETL/)
 
 ## Setup
@@ -23,7 +26,6 @@ Follow these steps to set up the project environment:
 
 Make sure you have Python 3.12 and [pre-commit](https://pre-commit.com/#intro) installed on your system. You can
 download it from [Python's official website](https://www.python.org/downloads/).
-And
 
 ## Configuration
 
