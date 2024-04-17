@@ -66,6 +66,9 @@ if env == "test":
     db = "dbo"
     pool_size = 10
     table_name_source = "Packages"
+    table_name_source_dat = "source_dat"
+    table_name_source_csv = "source_csv"
+    silver_table = "silver_dat_csv_sql"
 else:
     # If the environment is not set to "test" or "dry-run"
     logger.info("Environment is set to Production")
@@ -85,6 +88,9 @@ else:
     db = "dbo"
     pool_size = 10
     table_name_source = "Packages"
+    table_name_source_dat = "source_dat"
+    table_name_source_csv = "source_csv"
+    silver_table = "silver_dat_csv_sql"
 
 # the lines need to be above each other to work source/etl_process/etl_process.py:80
 creation_column_csv = """  
@@ -120,4 +126,14 @@ creation_column_dat = """
     chk VARCHAR(255),
     source_filename VARCHAR(255),
     id INT AUTO_INCREMENT PRIMARY KEY
+"""
+
+creation_column_silver = """
+    voucher VARCHAR(255) PRIMARY KEY,
+    measure_datetime DATETIME,
+    Length DECIMAL(10,2),
+    Height DECIMAL(10,2),
+    Width DECIMAL(10,2),
+    Weight DECIMAL(10,2),
+    source INT
 """

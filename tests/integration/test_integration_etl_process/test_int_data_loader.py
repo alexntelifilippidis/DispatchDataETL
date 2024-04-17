@@ -200,3 +200,90 @@ async def test_data_loader_mysql_dat():
             "test.dat",
         ),
     ]
+
+
+@pytest.mark.asyncio
+async def test_data_loader_mysql_silver():
+    import config as conf
+
+    data = [
+        ("ABC123", datetime.datetime(2024, 4, 8, 12, 0), Decimal("2.50"), Decimal("10.50"), Decimal("8.00"), Decimal("5.50"), 3),
+        ("DEF456", datetime.datetime(2024, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+    ]
+    loop = asyncio.get_event_loop()
+    mysql_data_loader = MySQLDataLoader(
+        host=conf.host,
+        port=conf.port,  # Your MySQL port
+        user=conf.user,
+        password=conf.password,
+        db=conf.db,
+        pool_size=conf.pool_size,
+    )
+
+    await mysql_data_loader.load_data_to_db(
+        data=data,
+        table_name=conf.silver_table,
+        creation_columns=conf.creation_column_silver,
+        chunk_size=conf.chunk_size,
+        loop=loop,
+        deduplication_columns=["voucher"],
+        deduplication_method=True,
+    )
+    actual_data = await query_and_delete_data(
+        host=conf.host,
+        port=conf.port,  # Your MySQL port
+        user=conf.user,
+        password=conf.password,
+        db=conf.db,
+        pool_size=conf.pool_size,
+        table_name=conf.silver_table,
+    )
+
+    assert actual_data == (
+        ("ABC123", datetime.datetime(2024, 4, 8, 12, 0), Decimal("2.50"), Decimal("10.50"), Decimal("8.00"), Decimal("5.50"), 3),
+        ("DEF456", datetime.datetime(2024, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+    )
+
+
+@pytest.mark.asyncio
+async def test_data_loader_mysql_silver_deduplicate():
+    import config as conf
+
+    data = [
+        ("ABC123", datetime.datetime(2024, 4, 8, 12, 0), Decimal("2.50"), Decimal("10.50"), Decimal("8.00"), Decimal("5.50"), 3),
+        ("ABC123", datetime.datetime(2025, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+        ("DEF456", datetime.datetime(2024, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+    ]
+    loop = asyncio.get_event_loop()
+    mysql_data_loader = MySQLDataLoader(
+        host=conf.host,
+        port=conf.port,  # Your MySQL port
+        user=conf.user,
+        password=conf.password,
+        db=conf.db,
+        pool_size=conf.pool_size,
+    )
+
+    await mysql_data_loader.load_data_to_db(
+        data=data,
+        table_name=conf.silver_table,
+        creation_columns=conf.creation_column_silver,
+        chunk_size=conf.chunk_size,
+        loop=loop,
+        deduplication_columns=["voucher"],
+        deduplication_method=True,
+    )
+    actual_data = await query_and_delete_data(
+        host=conf.host,
+        port=conf.port,  # Your MySQL port
+        user=conf.user,
+        password=conf.password,
+        db=conf.db,
+        pool_size=conf.pool_size,
+        table_name=conf.silver_table,
+    )
+
+    assert actual_data == (
+        ("ABC123", datetime.datetime(2025, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+        ("DEF456", datetime.datetime(2024, 4, 9, 13, 0), Decimal("3.20"), Decimal("12.00"), Decimal("9.00"), Decimal("6.00"), 3),
+    )

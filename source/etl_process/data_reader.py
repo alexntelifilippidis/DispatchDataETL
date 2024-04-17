@@ -2,7 +2,7 @@ import csv
 import datetime
 import os
 from datetime import datetime as dt
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import aiomysql
 from etl_process.abstract_data_loader import AbstractDataReader
@@ -251,20 +251,32 @@ class MySQLDataReader(AbstractDataReader):
         self.db = db
         self.pool_size = pool_size
 
-    async def read_data(self, table_name: str, dry_run: bool = False) -> List[Tuple]:
+    async def read_data(
+        self, table_name: str, columns: Optional[str] = "*", where_clause: Optional[str] = None, dry_run: bool = False
+    ) -> List[Tuple]:
         """
         Read data from MySQL database asynchronously.
 
         :param table_name: Name of the table in the database.
         :type table_name: str
+        :param columns: Optional columns to select from the table. Defaults to "*".
+        :type columns: str, optional
+        :param where_clause: Optional WHERE clause to filter data from the table.
+                             Note: Do not include the table name in the where_clause.
+        :type where_clause: str, optional
         :param dry_run: Flag indicating whether it's a dry run or not.
         :type dry_run: bool, optional
         :return: List of tuples containing the data read from the database.
         :rtype: List[Tuple]
         """
-        if dry_run:
-            logger.info("Performing dry run. No data will be fetched from the database.")
-            return []
+        # if dry_run:
+        #     logger.info("Performing dry run. No data will be fetched from the database.")
+        #     return []
+
+        full_query = f"SELECT {columns} FROM {table_name}"
+        if where_clause:
+            full_query += f" WHERE {where_clause}"
+
         async with aiomysql.create_pool(
             host=self.host,
             port=self.port,
@@ -275,7 +287,7 @@ class MySQLDataReader(AbstractDataReader):
         ) as pool:
             async with pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cursor:
-                    await cursor.execute(f"SELECT * FROM {table_name}")
+                    await cursor.execute(full_query)
                     result = await cursor.fetchall()
                     return result
 

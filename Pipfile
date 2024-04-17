@@ -10,6 +10,8 @@ anyio = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 ghp-import = "*"
+aiofiles = "*"
+types-aiofiles = "*"
 
 [dev-packages]
 pre-commit = "==3.7.0"

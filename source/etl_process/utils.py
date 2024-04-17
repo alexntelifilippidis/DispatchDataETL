@@ -1,10 +1,13 @@
 import asyncio
 import os
 import shutil
-from typing import Any, List, Tuple
+from datetime import datetime
+from typing import Any, Dict, List, Tuple, Union
 
+import aiofiles
 from etl_process.abstract_data_loader import AbstractDataReader
 from etl_process.logger import MyLogger
+from isort.place import module
 
 my_logger = MyLogger("DDELogger")
 logger = my_logger.get_logger()
@@ -97,3 +100,92 @@ async def check_all_files(
             )
 
     return clean_data
+
+
+async def fetch_and_combine_data(
+    reader: AbstractDataReader, conf: "module", dry_run: bool = False
+) -> List[Dict[str, Union[int, float, str]]]:
+    """Fetches data from MySQL databases and combines the results into one list of dictionaries.
+
+    :param reader: An instance of a class that implements the AbstractDataReader interface.
+    :type reader: AbstractDataReader
+    :param conf: The configuration module.
+    :type conf: module
+    :param dry_run: Flag indicating whether to perform a dry run (default is False).
+    :type dry_run: bool
+    :return: Combined data from all three sources.
+    :rtype: List[Dict[str, Union[int, float, str]]]
+    """
+    # Read maximum IDs from file
+    max_dat_id: int = 0
+    max_csv_id: int = 0
+    async with aiofiles.open("max_id.txt", "r") as f:
+        async for line in f:
+            if line.startswith("Maximum Dat ID:"):
+                max_dat_id = int(line.split(":")[1])
+            elif line.startswith("Maximum CSV ID:"):
+                max_csv_id = int(line.split(":")[1])
+
+    # Fetch data from MySQL databases
+    source_csv_data_task = reader.read_data(
+        table_name=conf.table_name_source_csv,
+        columns="id,voucher,measure_datetime,Length,Height,Width,Weight,2 as source",
+        where_clause=f"id>{max_csv_id}",
+        dry_run=dry_run,
+    )
+    source_dat_data_task = reader.read_data(
+        table_name=conf.table_name_source_dat,
+        columns="id,b as voucher,measure_datetime,wt as weight,CAST(SUBSTRING_INDEX(d, 'X', 1) AS FLOAT) AS Lenght,"
+        "CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(d, 'X', 2), ' ', -1) AS FLOAT) AS Height,"
+        "CAST(SUBSTRING_INDEX(d, 'X', -1) AS FLOAT) AS Width,1 as source",
+        where_clause=f"id>{max_dat_id}",
+        dry_run=dry_run,
+    )
+    mysql_task = reader.read_data(
+        table_name=conf.table_name_source,
+        columns="Barcode as voucher,IssueDate as measure_datetime,WeightKg as weight,LengthCm AS Lenght,"
+        "HeightCm AS Height,WidthCm AS Width,3 as source",
+        dry_run=dry_run,
+    )
+    csv_data_source, dat_data_source, mysql_data = await asyncio.gather(source_csv_data_task, source_dat_data_task, mysql_task)
+
+    # Combine the results into one list of dictionaries
+    combined_data: List[Dict[str, Union[int, float, str]]] = []
+    combined_data.extend(csv_data_source)
+    combined_data.extend(dat_data_source)
+    combined_data.extend(mysql_data)
+
+    # Update maximum IDs in the file
+    max_dat_id_new = max(row["id"] for row in dat_data_source) if dat_data_source else max_dat_id
+    max_csv_id_new = max(row["id"] for row in csv_data_source) if csv_data_source else max_csv_id
+    async with aiofiles.open("max_id.txt", "w") as f:
+        await f.write(f"Maximum Dat ID: {max_dat_id_new}\n")
+        await f.write(f"Maximum CSV ID: {max_csv_id_new}\n")
+
+    return combined_data
+
+
+async def deduplicate_data(data: List[Dict[str, Any]]) -> List[Tuple]:
+    """Deduplicates a list of dictionaries based on 'voucher', keeping entries with the biggest 'source'
+    and then the biggest 'measure_datetime'.
+
+    :param data: List of dictionaries containing the data to be deduplicated.
+    :type data: List[Dict[str, Any]]
+    :return: Deduplicated list of tuples.
+    :rtype: List[Tuple]
+    """
+    # Step 1: Group the entries by their 'voucher' key
+    grouped_data: Dict = {}
+    for entry in data:
+        voucher = entry.get("voucher")
+        if voucher not in grouped_data:
+            grouped_data[voucher] = []
+        grouped_data[voucher].append(entry)
+
+    # Step 2-5: Deduplicate entries within each group
+    deduplicated_data = []
+    for voucher, entries in grouped_data.items():
+        entries.sort(key=lambda x: (x.get("source", 0), x.get("measure_datetime", datetime.min)), reverse=True)
+        deduplicated_data.append(tuple(v for k, v in entries[0].items() if k != "id"))
+
+    return deduplicated_data

@@ -4,7 +4,7 @@ import os
 import config as conf
 from etl_process.data_loader import MySQLDataLoader
 from etl_process.data_reader import CSVDataReader, DATDataReader, MySQLDataReader
-from etl_process.utils import check_all_files, logger, my_logger, read_all_files
+from etl_process.utils import check_all_files, deduplicate_data, fetch_and_combine_data, logger, my_logger, read_all_files
 
 
 async def main(dry_run: bool) -> None:
@@ -60,14 +60,10 @@ async def main(dry_run: bool) -> None:
         destination_dir=conf.dat_destination_dir,
         dry_run=dry_run,
     )
-    mysql_task = mysql_data_reader.read_data(table_name=conf.table_name_source)
 
     logger.info("Starting read data process")
 
-    # Execute tasks concurrently
-    csv_data = await csv_task
-    dat_data = await dat_task
-    mysql_data = await mysql_task
+    csv_data, dat_data = await asyncio.gather(csv_task, dat_task)
 
     await my_logger.log_with_time_elapsed("Finish read data process")
     logger.info("Starting data transforming process")
@@ -98,8 +94,8 @@ async def main(dry_run: bool) -> None:
         destination_dir=conf.corrupted_dat_destination_dir,
         dry_run=dry_run,
     )
-    csv_data_checked = await csv_check_task
-    dat_data_checked = await dat_check_task
+
+    csv_data_checked, dat_data_checked = await asyncio.gather(csv_check_task, dat_check_task)
 
     await my_logger.log_with_time_elapsed("Finish data checking process")
     logger.info("Starting data ingestion to Source DBs")
@@ -108,8 +104,8 @@ async def main(dry_run: bool) -> None:
     loop = asyncio.get_event_loop()
 
     await mysql_data_loader.load_data_to_db(
-        data=csv_data_checked,
-        table_name="source_dat",
+        data=dat_data_checked,
+        table_name=conf.table_name_source_dat,
         creation_columns=conf.creation_column_dat,
         chunk_size=conf.chunk_size,
         loop=loop,
@@ -117,8 +113,8 @@ async def main(dry_run: bool) -> None:
     )
 
     await mysql_data_loader.load_data_to_db(
-        data=dat_data_checked,
-        table_name="source_csv",
+        data=csv_data_checked,
+        table_name=conf.table_name_source_csv,
         creation_columns=conf.creation_column_csv,
         chunk_size=conf.chunk_size,
         loop=loop,
@@ -130,6 +126,25 @@ async def main(dry_run: bool) -> None:
     # =====================
     #     Silver Layer
     # =====================
+    logger.info("Starting fetch and deduplicate source data from DBs")
+
+    silver_data = await fetch_and_combine_data(reader=mysql_data_reader, conf=conf, dry_run=dry_run)
+    silver_deduplicated_data = await deduplicate_data(silver_data)
+
+    await my_logger.log_with_time_elapsed("Finish data fetching and deduplicating from DBs")
+
+    await mysql_data_loader.load_data_to_db(
+        data=silver_deduplicated_data,
+        table_name=conf.silver_table,
+        creation_columns=conf.creation_column_silver,
+        chunk_size=conf.chunk_size,
+        loop=loop,
+        deduplication_columns=["voucher"],
+        deduplication_method=True,
+        dry_run=dry_run,
+    )
+
+    await my_logger.log_with_time_elapsed("Finish data ingestion to Silver DBs")
 
 
 if __name__ == "__main__":

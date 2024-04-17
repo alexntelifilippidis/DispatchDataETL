@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any
+from typing import Any, Optional
 
 import aiomysql
 from etl_process.abstract_data_loader import AbstractDataLoader
@@ -48,6 +48,8 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
         creation_columns: str,
         chunk_size: int,
         loop: Any,
+        deduplication_columns: Optional[list[str]] = None,
+        deduplication_method: Optional[bool] = False,
         dry_run: bool = False,
     ) -> None:
         """
@@ -63,6 +65,10 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
         :type chunk_size: int
         :param loop: asyncio event loop
         :type loop: Any
+        :param deduplication_columns: List of column names to be used for deduplication.
+        :type deduplication_columns: List[str], optional
+        :param deduplication_method: Flag indicating whether Method for deduplication is on or not.
+        :type deduplication_method: bool, optional
         :param dry_run: Flag indicating whether it's a dry run or not.
         :type dry_run: bool, optional
         :raises TypeError: If there is a type error occurred during data insertion.
@@ -98,7 +104,19 @@ class MySQLDataLoader(AbstractDataLoader, ABC):
                         logger.debug(f"SQL Query: {query}")
                         logger.debug(f"Values: {values}")
                     else:
-                        query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
+                        if deduplication_method:
+                            # Use ON DUPLICATE KEY UPDATE for deduplication
+                            query = (
+                                f"INSERT INTO {table_name} "
+                                f"({', '.join(updated_columns)}) "
+                                f"VALUES "
+                                f"({', '.join(['%s'] * len(updated_columns))}) AS alias "
+                                f"ON DUPLICATE KEY UPDATE "
+                                f"{', '.join([f'{col} = alias.{col}' for col in updated_columns[1:]])}"
+                            )
+                        else:
+                            # Use INSERT IGNORE for deduplication
+                            query = f"INSERT IGNORE INTO {table_name} ({', '.join(updated_columns)}) VALUES ({value_placeholders})"
                     try:
                         await cur.executemany(query, values)
                         await conn.commit()
