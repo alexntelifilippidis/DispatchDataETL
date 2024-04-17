@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>etl_process.utils &mdash; DispatchDataETL 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DispatchDataETL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ExternalResources.html">External Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DispatchDataETL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">etl_process.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for etl_process.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">aiofiles</span>
+<span class="kn">from</span> <span class="nn">etl_process.abstract_data_loader</span> <span class="kn">import</span> <span class="n">AbstractDataReader</span>
+<span class="kn">from</span> <span class="nn">etl_process.logger</span> <span class="kn">import</span> <span class="n">MyLogger</span>
+<span class="kn">from</span> <span class="nn">isort.place</span> <span class="kn">import</span> <span class="n">module</span>
+
+<span class="n">my_logger</span> <span class="o">=</span> <span class="n">MyLogger</span><span class="p">(</span><span class="s2">&quot;DDELogger&quot;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">my_logger</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="move_file">
+<a class="viewcode-back" href="../../etl_process.html#etl_process.utils.move_file">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">move_file</span><span class="p">(</span><span class="n">source_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">destination_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Move a file asynchronously from a source path to a destination path.</span>
+
+<span class="sd">    :param source_path: The path of the file to move.</span>
+<span class="sd">    :type source_path: str</span>
+<span class="sd">    :param destination_dir: The path where the file should be moved to.</span>
+<span class="sd">    :type destination_dir: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination_dir</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_all_files">
+<a class="viewcode-back" href="../../etl_process.html#etl_process.utils.read_all_files">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">read_all_files</span><span class="p">(</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">AbstractDataReader</span><span class="p">,</span> <span class="n">file_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">destination_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read data from all files asynchronously.</span>
+
+<span class="sd">    :param reader: An instance of a class that implements the AbstractDataReader interface.</span>
+<span class="sd">    :type reader: AbstractDataReader</span>
+<span class="sd">    :param file_paths: A list of file paths to read.</span>
+<span class="sd">    :type file_paths: list[str]</span>
+<span class="sd">    :param destination_dir: The destination dir path</span>
+<span class="sd">    :type destination_dir: str</span>
+<span class="sd">    :param dry_run: Flag indicating whether it&#39;s a dry run or not.</span>
+<span class="sd">    :type dry_run: bool</span>
+<span class="sd">    :return: A list containing the results of reading data from all files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Performing dry run. No file will be moved to destination dir&quot;</span><span class="p">)</span>
+    <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span> <span class="n">destination_dir</span><span class="o">=</span><span class="n">destination_dir</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">file_paths</span><span class="p">]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+
+<div class="viewcode-block" id="check_all_files">
+<a class="viewcode-back" href="../../etl_process.html#etl_process.utils.check_all_files">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">check_all_files</span><span class="p">(</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">AbstractDataReader</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span>
+    <span class="n">corrupted_files</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">destination_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check the format and content of the provided data tuples.</span>
+<span class="sd">    Remove all data from the corrupted files.</span>
+<span class="sd">    Move the corrupted files to another folder.</span>
+
+<span class="sd">    :param reader: An instance of a class that implements the AbstractDataReader interface.</span>
+<span class="sd">    :type reader: AbstractDataReader</span>
+<span class="sd">    :param data: A list of tuples, each containing data in the specified format.</span>
+<span class="sd">    :type data: List[Tuple]</span>
+<span class="sd">    :param corrupted_files: A list with the corrupted files come from reader.transform_data.</span>
+<span class="sd">    :type corrupted_files: List</span>
+<span class="sd">    :param file_path: The path to the DAT file to read.</span>
+<span class="sd">    :type file_path: str</span>
+<span class="sd">    :param destination_dir: The path to move the DAT file to after reading.</span>
+<span class="sd">    :type destination_dir: str</span>
+<span class="sd">    :param dry_run: Flag indicating whether it&#39;s a dry run or not.</span>
+<span class="sd">    :type dry_run: bool</span>
+<span class="sd">    :return: A list of clean data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">reader</span><span class="o">.</span><span class="n">check_data</span><span class="p">(</span><span class="n">data_tuple</span><span class="p">)</span> <span class="k">for</span> <span class="n">data_tuple</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+    <span class="n">corrupted_files</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">filename</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">filename</span><span class="p">]))</span>
+
+    <span class="n">clean_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">data_tuple</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_tuple</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">corrupted_files</span><span class="p">:</span>
+            <span class="n">clean_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_tuple</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">corrupted_files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">corrupted_files</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">move_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file</span><span class="p">),</span> <span class="n">destination_dir</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Corrupted files moved to </span><span class="si">{</span><span class="n">destination_dir</span><span class="si">}</span>
+<span class="s2">                                                Corrupted Files: </span><span class="si">{</span><span class="n">corrupted_files</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Performing dry run. No file will be moved to destination dir after check&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Corrupted files not moved to </span><span class="si">{</span><span class="n">destination_dir</span><span class="si">}</span>
+<span class="s2">                                                Corrupted Files: </span><span class="si">{</span><span class="n">corrupted_files</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">clean_data</span></div>
+
+
+
+<div class="viewcode-block" id="fetch_and_combine_data">
+<a class="viewcode-back" href="../../etl_process.html#etl_process.utils.fetch_and_combine_data">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">fetch_and_combine_data</span><span class="p">(</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="n">AbstractDataReader</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="s2">&quot;module&quot;</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches data from MySQL databases and combines the results into one list of dictionaries.</span>
+
+<span class="sd">    :param reader: An instance of a class that implements the AbstractDataReader interface.</span>
+<span class="sd">    :type reader: AbstractDataReader</span>
+<span class="sd">    :param conf: The configuration module.</span>
+<span class="sd">    :type conf: module</span>
+<span class="sd">    :param dry_run: Flag indicating whether to perform a dry run (default is False).</span>
+<span class="sd">    :type dry_run: bool</span>
+<span class="sd">    :return: Combined data from all three sources.</span>
+<span class="sd">    :rtype: List[Dict[str, Union[int, float, str]]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Read maximum IDs from file</span>
+    <span class="n">max_dat_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_csv_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;max_id.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Maximum Dat ID:&quot;</span><span class="p">):</span>
+                <span class="n">max_dat_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Maximum CSV ID:&quot;</span><span class="p">):</span>
+                <span class="n">max_csv_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Fetch data from MySQL databases</span>
+    <span class="n">source_csv_data_task</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">table_name_source_csv</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;id,voucher,measure_datetime,Length,Height,Width,Weight,2 as source&quot;</span><span class="p">,</span>
+        <span class="n">where_clause</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;id&gt;</span><span class="si">{</span><span class="n">max_csv_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">source_dat_data_task</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">table_name_source_dat</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;id,b as voucher,measure_datetime,wt as weight,CAST(SUBSTRING_INDEX(d, &#39;X&#39;, 1) AS FLOAT) AS Lenght,&quot;</span>
+        <span class="s2">&quot;CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(d, &#39;X&#39;, 2), &#39; &#39;, -1) AS FLOAT) AS Height,&quot;</span>
+        <span class="s2">&quot;CAST(SUBSTRING_INDEX(d, &#39;X&#39;, -1) AS FLOAT) AS Width,1 as source&quot;</span><span class="p">,</span>
+        <span class="n">where_clause</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;id&gt;</span><span class="si">{</span><span class="n">max_dat_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mysql_task</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
+        <span class="n">table_name</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">table_name_source</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;Barcode as voucher,IssueDate as measure_datetime,WeightKg as weight,LengthCm AS Lenght,&quot;</span>
+        <span class="s2">&quot;HeightCm AS Height,WidthCm AS Width,3 as source&quot;</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">csv_data_source</span><span class="p">,</span> <span class="n">dat_data_source</span><span class="p">,</span> <span class="n">mysql_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">source_csv_data_task</span><span class="p">,</span> <span class="n">source_dat_data_task</span><span class="p">,</span> <span class="n">mysql_task</span><span class="p">)</span>
+
+    <span class="c1"># Combine the results into one list of dictionaries</span>
+    <span class="n">combined_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">combined_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">csv_data_source</span><span class="p">)</span>
+    <span class="n">combined_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dat_data_source</span><span class="p">)</span>
+    <span class="n">combined_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mysql_data</span><span class="p">)</span>
+
+    <span class="c1"># Update maximum IDs in the file</span>
+    <span class="n">max_dat_id_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dat_data_source</span><span class="p">)</span> <span class="k">if</span> <span class="n">dat_data_source</span> <span class="k">else</span> <span class="n">max_dat_id</span>
+    <span class="n">max_csv_id_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_data_source</span><span class="p">)</span> <span class="k">if</span> <span class="n">csv_data_source</span> <span class="k">else</span> <span class="n">max_csv_id</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;max_id.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Dat ID: </span><span class="si">{</span><span class="n">max_dat_id_new</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum CSV ID: </span><span class="si">{</span><span class="n">max_csv_id_new</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">combined_data</span></div>
+
+
+
+<div class="viewcode-block" id="deduplicate_data">
+<a class="viewcode-back" href="../../etl_process.html#etl_process.utils.deduplicate_data">[docs]</a>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">deduplicate_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicates a list of dictionaries based on &#39;voucher&#39;, keeping entries with the biggest &#39;source&#39;</span>
+<span class="sd">    and then the biggest &#39;measure_datetime&#39;.</span>
+
+<span class="sd">    :param data: List of dictionaries containing the data to be deduplicated.</span>
+<span class="sd">    :type data: List[Dict[str, Any]]</span>
+<span class="sd">    :return: Deduplicated list of tuples.</span>
+<span class="sd">    :rtype: List[Tuple]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Step 1: Group the entries by their &#39;voucher&#39; key</span>
+    <span class="n">grouped_data</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">voucher</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;voucher&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">voucher</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">:</span>
+            <span class="n">grouped_data</span><span class="p">[</span><span class="n">voucher</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">grouped_data</span><span class="p">[</span><span class="n">voucher</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="c1"># Step 2-5: Deduplicate entries within each group</span>
+    <span class="n">deduplicated_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">voucher</span><span class="p">,</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;measure_datetime&quot;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">)),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">deduplicated_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;id&quot;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">deduplicated_data</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Alexandros Ntelifilippidis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
