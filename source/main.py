@@ -63,6 +63,7 @@ async def main(dry_run: bool) -> None:
 
     logger.info("Starting read data process")
 
+    # Gather file reading data
     csv_data, dat_data = await asyncio.gather(csv_task, dat_task)
 
     await my_logger.log_with_time_elapsed("Finish read data process")
@@ -94,7 +95,7 @@ async def main(dry_run: bool) -> None:
         destination_dir=conf.corrupted_dat_destination_dir,
         dry_run=dry_run,
     )
-
+    # Gather checked data
     csv_data_checked, dat_data_checked = await asyncio.gather(csv_check_task, dat_check_task)
 
     await my_logger.log_with_time_elapsed("Finish data checking process")
@@ -128,11 +129,14 @@ async def main(dry_run: bool) -> None:
     # =====================
     logger.info("Starting fetch and deduplicate source data from DBs")
 
+    # Gather data from bronze tables
     silver_data = await fetch_and_combine_data(reader=mysql_data_reader, conf=conf, dry_run=dry_run)
+    # Deduplicate silver data
     silver_deduplicated_data = await deduplicate_data(silver_data)
 
     await my_logger.log_with_time_elapsed("Finish data fetching and deduplicating from DBs")
 
+    # Load data to silver tables
     await mysql_data_loader.load_data_to_db(
         data=silver_deduplicated_data,
         table_name=conf.silver_table,

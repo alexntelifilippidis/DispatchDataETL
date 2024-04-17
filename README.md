@@ -160,6 +160,8 @@ The CI pipeline is configured in the [GitHub actions](.github/workflows/ci.yml) 
 │   ├── docs                    # Directory that created from sphinx and manages the html doc that exists in github
 │   ├── etl_process             # Directory for all etl classes
 │   ├── config.py               # Config file for the source code
+│   ├── max_id.txt              # The file that we save the max id for every insertion to the bronze tables so we can 
+│   │                             identify where we need to start the next run to ingest data to silver layer
 │   └── main.py                 # The running file           
 ├── tests                       # Directory for all tests
 │   ├── sql_scripts             # Directory init sql script for test db
