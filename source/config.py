@@ -73,7 +73,7 @@ else:
     # If the environment is not set to "test" or "dry-run"
     logger.info("Environment is set to Production")
     # Add your non-test configurations or actions here
-    dry_run = True
+    dry_run = False
     dat_dir = "../tests/test_data/test_data_dat"
     dat_destination_dir = "../tests/test_data/test_data_dat_destination"
     corrupted_dat_destination_dir = "../tests/test_data/test_data_dat_corrupted_destination"
